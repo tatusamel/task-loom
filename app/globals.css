@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-slate-100 text-slate-900 antialiased;
+}
+
+a {
+  @apply text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500;
+}
+
+button {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+}
+
+input,
+textarea,
+select {
+  @apply focus:ring-indigo-500;
+}
+
+.markdown-preview {
+  @apply text-sm leading-6 text-slate-700;
+}
+
+.markdown-preview h1 {
+  @apply text-2xl font-semibold text-slate-900;
+}
+
+.markdown-preview h2 {
+  @apply mt-4 text-xl font-semibold text-slate-900;
+}
+
+.markdown-preview h3 {
+  @apply mt-3 text-lg font-semibold text-slate-900;
+}
+
+.markdown-preview p {
+  @apply mt-2;
+}
+
+.markdown-preview ul,
+.markdown-preview ol {
+  @apply ml-5 mt-3 space-y-1;
+}
+
+.markdown-preview ul {
+  list-style-type: disc;
+}
+
+.markdown-preview ol {
+  list-style-type: decimal;
+}
+
+.markdown-preview code {
+  @apply rounded bg-slate-100 px-1.5 py-0.5 text-[0.85rem] font-medium text-slate-800;
+}
+
+.markdown-preview pre {
+  @apply mt-3 overflow-x-auto rounded-md bg-slate-900 p-3 text-xs text-slate-100;
+}
+
+.markdown-preview blockquote {
+  @apply mt-3 border-l-4 border-indigo-200 pl-3 italic text-slate-600;
+}

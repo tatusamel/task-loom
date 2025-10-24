@@ -1,0 +1,73 @@
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import prisma from '@/lib/prisma';
+import { parseQuickAdd } from '@/utils/parseQuickAdd';
+import { createNoteSchema } from '@/lib/validation';
+import { ensureTagsExist, normalizeTags } from '@/lib/tags';
+
+type QuickAddState = {
+  status: 'idle' | 'success' | 'error';
+  message?: string;
+};
+
+export async function createQuickNoteAction(
+  _: QuickAddState,
+  formData: FormData,
+): Promise<QuickAddState> {
+  const rawInput = formData.get('quickAdd');
+  if (typeof rawInput !== 'string' || !rawInput.trim()) {
+    return {
+      status: 'error',
+      message: 'Please enter a note before submitting.',
+    };
+  }
+
+  const parsed = parseQuickAdd(rawInput);
+  const validation = createNoteSchema.safeParse({
+    title: parsed.title,
+    content: '',
+    tags: parsed.tags,
+  });
+
+  if (!validation.success) {
+    return {
+      status: 'error',
+      message: 'Unable to create note. Please adjust the title or tags.',
+    };
+  }
+
+  try {
+    const normalizedTags = normalizeTags(validation.data.tags);
+    await ensureTagsExist(normalizedTags);
+
+    const note = await prisma.note.create({
+      data: {
+        title: validation.data.title,
+        content: validation.data.content ?? '',
+        pinned: false,
+        archived: false,
+        tags:
+          normalizedTags.length > 0
+            ? {
+                connect: normalizedTags.map(name => ({ name })),
+              }
+            : undefined,
+      },
+    });
+
+    revalidatePath('/');
+    revalidatePath('/notes');
+
+    return {
+      status: 'success',
+      message: `Captured “${note.title}”.`,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: 'error',
+      message: 'Unexpected error while saving the note.',
+    };
+  }
+}
