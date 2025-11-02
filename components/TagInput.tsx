@@ -1,6 +1,10 @@
 'use client';
 
 import { useState, type KeyboardEvent } from 'react';
+import { TagIcon, XIcon } from '@/components/icons';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 interface TagInputProps {
@@ -36,24 +40,28 @@ export function TagInput({ value, onChange, placeholder }: TagInputProps) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
+    <div className="flex flex-wrap items-center gap-2 rounded-md px-0 py-1 text-sm">
       {value.map(tag => (
-        <span
+        <Badge
           key={tag}
-          className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700"
+          variant="secondary"
+          className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium"
         >
-          #{tag}
-          <button
+          <TagIcon className="h-3 w-3" aria-hidden />
+          {tag}
+          <Button
             type="button"
-            className="rounded-full bg-transparent text-slate-500 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            size="icon"
+            variant="ghost"
+            className="h-6 w-6 rounded-full text-slate-500 hover:text-slate-900"
             onClick={() => onChange(value.filter(existing => existing !== tag))}
             aria-label={`Remove tag ${tag}`}
           >
-            ×
-          </button>
-        </span>
+            <XIcon className="h-3.5 w-3.5" aria-hidden />
+          </Button>
+        </Badge>
       ))}
-      <input
+      <Input
         type="text"
         value={inputValue}
         onChange={event => setInputValue(event.target.value)}
@@ -61,7 +69,7 @@ export function TagInput({ value, onChange, placeholder }: TagInputProps) {
         onBlur={() => commitTag(inputValue)}
         placeholder={value.length === 0 ? placeholder ?? 'Add tags…' : undefined}
         className={cn(
-          'min-w-[160px] flex-1 border-none bg-transparent px-0 py-1 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-0',
+          'min-w-[160px] flex-1 border-none bg-transparent px-0 py-1 shadow-none outline-none focus:border-none focus:outline-none focus:ring-0',
         )}
       />
     </div>

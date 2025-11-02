@@ -70,9 +70,9 @@ export async function getTasks(filters: TaskFilters = {}): Promise<TaskDTO[]> {
   if (query?.trim()) {
     const contains = query.trim();
     where.OR = [
-      { title: { contains, mode: 'insensitive' } },
-      { notes: { contains, mode: 'insensitive' } },
-      { project: { contains, mode: 'insensitive' } },
+      { title: { contains } },
+      { notes: { contains } },
+      { project: { contains } },
     ];
   }
 

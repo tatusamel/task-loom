@@ -4,6 +4,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { toast } from 'react-hot-toast';
+import { Badge } from '@/components/ui/badge';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  ArchiveIcon,
+  ArrowRightIcon,
+  LoaderIcon,
+  PinIcon,
+  RestoreIcon,
+  TagIcon,
+} from '@/components/icons';
 import type { NoteDTO } from '@/types/note';
 import { cn, formatDateTime } from '@/lib/utils';
 import { renderMarkdown } from '@/lib/markdown';
@@ -21,6 +32,7 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const showSelection = Boolean(selection);
+  const selectionInset = showSelection ? 'pl-10 sm:pl-11' : '';
 
   const mutateNote = (payload: Partial<Pick<NoteDTO, 'pinned' | 'archived'>>, success: string) => {
     startTransition(async () => {
@@ -67,16 +79,14 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
     : '';
 
   return (
-    <article
-      className={cn(
-        'relative flex flex-col rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-indigo-200 hover:shadow',
-        showSelection && 'pl-12 sm:pl-14',
-      )}
+    <Card
+      as="article"
+      className="relative flex flex-col"
       data-testid="note-card"
       data-note-id={note.id}
     >
       {selection ? (
-        <div className="absolute left-5 top-5">
+        <div className="absolute left-4 top-6 sm:left-5">
           <input
             id={`select-${note.id}`}
             type="checkbox"
@@ -89,73 +99,93 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
           </label>
         </div>
       ) : null}
-      <header className="flex items-start justify-between gap-4">
-        <div>
-          <Link
-            href={`/notes/${note.id}`}
-            className="text-base font-semibold text-slate-900 transition hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
-          >
-            {note.title}
-          </Link>
-          <p className="mt-1 text-xs text-slate-400">
-            Updated {formatDateTime(note.updatedAt)}
-          </p>
+      <CardHeader className={cn('flex flex-row items-start justify-between gap-4', selectionInset)}>
+        <div className="space-y-1">
+          <CardTitle>
+            <Link
+              href={`/notes/${note.id}`}
+              className="transition hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            >
+              {note.title}
+            </Link>
+          </CardTitle>
+          <p className="text-xs text-slate-400">Updated {formatDateTime(note.updatedAt)}</p>
         </div>
         {note.pinned ? (
-          <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700">
+          <Badge variant="warning" className="inline-flex items-center gap-1">
+            <PinIcon className="h-3 w-3" aria-hidden />
             Pinned
-          </span>
+          </Badge>
         ) : null}
-      </header>
-      {previewHtml ? (
-        <div
-          className="markdown-preview mt-3 text-sm leading-relaxed text-slate-600"
-          dangerouslySetInnerHTML={{ __html: previewHtml }}
-        />
-      ) : (
-        <p className="mt-3 text-sm text-slate-400">No content yet.</p>
-      )}
-      <div className="mt-4 flex flex-wrap gap-2">
-        {note.tags.map(tag => (
-          <span
-            key={tag}
-            className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600"
-          >
-            #{tag}
-          </span>
-        ))}
-        {note.tags.length === 0 ? (
-          <span className="text-xs text-slate-400">No tags</span>
-        ) : null}
-      </div>
-      <footer className="mt-5 flex items-center gap-2">
-        <button
+      </CardHeader>
+      <CardContent className={cn('flex flex-col gap-4', selectionInset)}>
+        {previewHtml ? (
+          <div
+            className="markdown-preview text-sm leading-relaxed text-slate-600"
+            dangerouslySetInnerHTML={{ __html: previewHtml }}
+          />
+        ) : (
+          <p className="text-sm text-slate-400">No content yet.</p>
+        )}
+        <div className="flex flex-wrap gap-2">
+          {note.tags.map(tag => (
+            <Badge
+              key={tag}
+              variant="secondary"
+              className="inline-flex items-center gap-1 text-xs font-medium"
+            >
+              <TagIcon className="h-3 w-3" aria-hidden />
+              {tag}
+            </Badge>
+          ))}
+          {note.tags.length === 0 ? (
+            <span className="text-xs text-slate-400">No tags</span>
+          ) : null}
+        </div>
+      </CardContent>
+      <CardFooter className={cn('mt-auto flex flex-wrap gap-2', selectionInset)}>
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={handlePinToggle}
           disabled={isPending}
           aria-pressed={note.pinned}
-          className="inline-flex items-center rounded-md border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
           data-testid="note-card-pin"
         >
+          {isPending ? (
+            <LoaderIcon className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+          ) : (
+            <PinIcon className="mr-2 h-4 w-4" aria-hidden />
+          )}
           {note.pinned ? 'Unpin' : 'Pin'}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={handleArchiveToggle}
           disabled={isPending}
           aria-pressed={note.archived}
-          className="inline-flex items-center rounded-md border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
           data-testid="note-card-archive"
         >
+          {isPending ? (
+            <LoaderIcon className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+          ) : note.archived ? (
+            <RestoreIcon className="mr-2 h-4 w-4" aria-hidden />
+          ) : (
+            <ArchiveIcon className="mr-2 h-4 w-4" aria-hidden />
+          )}
           {note.archived ? 'Restore' : 'Archive'}
-        </button>
+        </Button>
         <Link
           href={`/notes/${note.id}`}
-          className="ml-auto inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'ml-auto')}
         >
           Open
+          <ArrowRightIcon className="ml-2 h-4 w-4" aria-hidden />
         </Link>
-      </footer>
-    </article>
+      </CardFooter>
+    </Card>
   );
 }

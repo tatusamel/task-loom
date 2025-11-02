@@ -1,6 +1,6 @@
 # Auto-Prioritizer Notes MVP
 
-Auto-Prioritizer Notes is a fast, keyboard-friendly notes surface built with Next.js, Prisma, and Tailwind CSS. This first iteration focuses on high-quality capture, organization, and editing flows so we can wire in automated prioritization signals next.
+Task Loom is a fast, keyboard-friendly notes surface built with Next.js, Prisma, and Tailwind CSS. This first iteration focuses on high-quality capture, organization, and editing flows so we can wire in automated prioritization signals next.
 
 ## Prerequisites
 

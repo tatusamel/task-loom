@@ -3,6 +3,19 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
+import {
+  CalendarIcon,
+  ClockIcon,
+  LoaderIcon,
+  SparklesIcon,
+  TagIcon,
+} from '@/components/icons';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { TagInput } from './TagInput';
 
 function normalizeTagInput(tags: string[]): string[] {
@@ -92,121 +105,126 @@ export function TaskCreateForm({ onCreated }: TaskCreateFormProps) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-      data-testid="task-create-form"
-    >
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-lg font-semibold text-slate-900">Create a task</h2>
-        <p className="text-xs text-slate-400">Capture details now; prioritization comes later.</p>
-      </div>
+    <Card as="form" onSubmit={handleSubmit} className="space-y-4" data-testid="task-create-form">
+      <CardHeader className="flex flex-col gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+          <SparklesIcon className="h-5 w-5 text-indigo-600" aria-hidden />
+          Create a task
+        </CardTitle>
+        <Badge variant="secondary" className="w-fit text-xs">
+          Capture details now; prioritization comes later.
+        </Badge>
+      </CardHeader>
 
-      <div>
-        <label className="block text-sm font-medium text-slate-700" htmlFor="task-title">
-          Title<span className="text-red-500">*</span>
-        </label>
-        <input
-          id="task-title"
-          name="title"
-          value={title}
-          onChange={event => setTitle(event.target.value)}
-          className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          placeholder="Draft launch plan"
-          required
-        />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
+      <CardContent className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-slate-700" htmlFor="task-dueAt">
-            Due date & time
-          </label>
-          <input
-            id="task-dueAt"
-            type="datetime-local"
-            value={dueAt}
-            onChange={event => setDueAt(event.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          <Label htmlFor="task-title" className="flex items-center gap-1 text-sm font-medium">
+            Title<span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="task-title"
+            name="title"
+            value={title}
+            onChange={event => setTitle(event.target.value)}
+            className="mt-1"
+            placeholder="Draft launch plan"
+            required
           />
         </div>
-        <div className="grid grid-cols-2 gap-4">
+
+        <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="task-effort">
-              Estimated effort (minutes)
-            </label>
-            <input
-              id="task-effort"
-              type="number"
-              min={5}
-              max={1440}
-              step={5}
-              value={estimatedEffort}
-              onChange={event => setEstimatedEffort(event.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              placeholder="60"
+            <Label htmlFor="task-dueAt" className="flex items-center gap-2">
+              <CalendarIcon className="h-4 w-4 text-slate-500" aria-hidden />
+              Due date &amp; time
+            </Label>
+            <Input
+              id="task-dueAt"
+              type="datetime-local"
+              value={dueAt}
+              onChange={event => setDueAt(event.target.value)}
+              className="mt-1"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="task-importance">
-              Importance (1-5)
-            </label>
-            <input
-              id="task-importance"
-              type="number"
-              min={1}
-              max={5}
-              step={1}
-              value={importance}
-              onChange={event => setImportance(event.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              placeholder="3"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="task-effort" className="flex items-center gap-2">
+                <ClockIcon className="h-4 w-4 text-slate-500" aria-hidden />
+                Estimated effort (minutes)
+              </Label>
+              <Input
+                id="task-effort"
+                type="number"
+                min={5}
+                max={1440}
+                step={5}
+                value={estimatedEffort}
+                onChange={event => setEstimatedEffort(event.target.value)}
+                className="mt-1"
+                placeholder="60"
+              />
+            </div>
+            <div>
+              <Label htmlFor="task-importance">Importance (1-5)</Label>
+              <Input
+                id="task-importance"
+                type="number"
+                min={1}
+                max={5}
+                step={1}
+                value={importance}
+                onChange={event => setImportance(event.target.value)}
+                className="mt-1"
+                placeholder="3"
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div>
-        <label className="block text-sm font-medium text-slate-700" htmlFor="task-project">
-          Project
-        </label>
-        <input
-          id="task-project"
-          value={project}
-          onChange={event => setProject(event.target.value)}
-          className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          placeholder="Website refresh"
-        />
-      </div>
+        <div>
+          <Label htmlFor="task-project">Project</Label>
+          <Input
+            id="task-project"
+            value={project}
+            onChange={event => setProject(event.target.value)}
+            className="mt-1"
+            placeholder="Website refresh"
+          />
+        </div>
 
-      <div>
-        <span className="block text-sm font-medium text-slate-700">Tags</span>
-        <TagInput value={tags} onChange={setTags} placeholder="Add tags and press Enter" />
-      </div>
+        <div>
+          <span className="flex items-center gap-2 text-sm font-medium text-slate-700">
+            <TagIcon className="h-4 w-4 text-slate-500" aria-hidden />
+            Tags
+          </span>
+          <TagInput value={tags} onChange={setTags} placeholder="Add tags and press Enter" />
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium text-slate-700" htmlFor="task-notes">
-          Notes
-        </label>
-        <textarea
-          id="task-notes"
-          value={notes}
-          onChange={event => setNotes(event.target.value)}
-          rows={4}
-          className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 text-sm leading-6 text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          placeholder="Add any additional context…"
-        />
-      </div>
+        <div>
+          <Label htmlFor="task-notes">Notes</Label>
+          <Textarea
+            id="task-notes"
+            value={notes}
+            onChange={event => setNotes(event.target.value)}
+            rows={4}
+            className="mt-1 leading-6"
+            placeholder="Add any additional context…"
+          />
+        </div>
+      </CardContent>
 
-      <div className="flex items-center justify-end">
-        <button
-          type="submit"
-          className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
-          disabled={submitting}
-        >
-          {submitting ? 'Saving…' : 'Add task'}
-        </button>
-      </div>
-    </form>
+      <CardFooter className="justify-end">
+        <Button type="submit" disabled={submitting}>
+          {submitting ? (
+            <span className="inline-flex items-center gap-2">
+              <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
+              Saving…
+            </span>
+          ) : (
+            'Add task'
+          )}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }

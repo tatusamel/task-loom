@@ -1,5 +1,8 @@
 'use client';
 
+import { SearchIcon } from '@/components/icons';
+import { Input } from '@/components/ui/input';
+
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
@@ -8,18 +11,20 @@ interface SearchBarProps {
 }
 
 export function SearchBar({ value, onChange, placeholder, testId }: SearchBarProps) {
+  const id = testId ?? 'search-input';
   return (
     <div className="relative flex-1">
-      <label className="sr-only" htmlFor={testId ?? 'search-input'}>
-        Search notes
+      <label className="sr-only" htmlFor={id}>
+        Search
       </label>
-      <input
-        id={testId ?? 'search-input'}
+      <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      <Input
+        id={id}
         type="search"
         value={value}
         onChange={event => onChange(event.target.value)}
         placeholder={placeholder ?? 'Search'}
-        className="w-full rounded-md border border-slate-200 px-3 py-2 pl-3 text-sm text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        className="pl-9"
         data-testid={testId}
         autoComplete="off"
       />

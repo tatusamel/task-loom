@@ -16,6 +16,7 @@ export async function createQuickNoteAction(
   formData: FormData,
 ): Promise<QuickAddState> {
   const rawInput = formData.get('quickAdd');
+  const rawContent = formData.get('quickAddContent');
   if (typeof rawInput !== 'string' || !rawInput.trim()) {
     return {
       status: 'error',
@@ -24,9 +25,10 @@ export async function createQuickNoteAction(
   }
 
   const parsed = parseQuickAdd(rawInput);
+  const content = typeof rawContent === 'string' ? rawContent.trim() : '';
   const validation = createNoteSchema.safeParse({
     title: parsed.title,
-    content: '',
+    content: content || undefined,
     tags: parsed.tags,
   });
 

@@ -4,6 +4,20 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { toast } from 'react-hot-toast';
+import {
+  ArchiveIcon,
+  ArrowRightIcon,
+  CalendarIcon,
+  CheckIcon,
+  ClockIcon,
+  LoaderIcon,
+  RestoreIcon,
+  TagIcon,
+  TrashIcon,
+} from '@/components/icons';
+import { Badge } from '@/components/ui/badge';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import type { TaskDTO } from '@/types/task';
 import { cn, formatDateTime, formatEffort, formatRelativeDue } from '@/lib/utils';
 
@@ -58,106 +72,137 @@ export function TaskCard({ task }: TaskCardProps) {
   const effortDescription = formatEffort(task.estimatedEffort);
 
   return (
-    <article
-      className={cn(
-        'flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-indigo-200 hover:shadow',
-        task.completed && 'opacity-85',
-      )}
+    <Card
+      as="article"
+      className={cn('flex flex-col gap-2', task.completed && 'opacity-85')}
       data-testid="task-card"
     >
-      <header className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <button
+      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
               type="button"
+              variant={task.completed ? 'secondary' : 'outline'}
+              size="sm"
               onClick={() => mutateTask({ completed: !task.completed })}
               disabled={isPending}
               aria-pressed={task.completed}
-              className={cn(
-                'inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
-                task.completed
-                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                  : 'border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200',
-              )}
             >
-              {task.completed ? 'Mark as active' : 'Mark complete'}
-            </button>
+              {isPending ? (
+                <LoaderIcon className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+              ) : (
+                <CheckIcon className="mr-2 h-4 w-4" aria-hidden />
+              )}
+              {task.completed ? 'Mark active' : 'Mark complete'}
+            </Button>
             {task.archived ? (
-              <span className="rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                Archived
-              </span>
+              <Badge variant="secondary">Archived</Badge>
             ) : null}
             {typeof task.importance === 'number' ? (
-              <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">{`Importance ${task.importance}`}</span>
+              <Badge variant="warning">{`Importance ${task.importance}`}</Badge>
             ) : null}
           </div>
-          <Link
-            href={`/tasks/${task.id}`}
-            className={cn(
-              'mt-2 block text-lg font-semibold leading-tight text-slate-900 transition hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
-              task.completed && 'line-through text-slate-500',
-            )}
-          >
-            {task.title}
-          </Link>
+          <CardTitle>
+            <Link
+              href={`/tasks/${task.id}`}
+              className={cn(
+                'transition hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
+                task.completed && 'line-through text-slate-500',
+              )}
+            >
+              {task.title}
+            </Link>
+          </CardTitle>
         </div>
         <div className="flex flex-col items-end gap-1 text-right text-xs text-slate-500">
           {task.dueAt ? (
             <>
-              <span>{formatDateTime(task.dueAt)}</span>
-              {dueDescription ? <span className="font-medium text-slate-600">{dueDescription}</span> : null}
+              <span className="inline-flex items-center gap-2">
+                <CalendarIcon className="h-3.5 w-3.5" aria-hidden />
+                {formatDateTime(task.dueAt)}
+              </span>
+              {dueDescription ? (
+                <span className="font-medium text-slate-600">{dueDescription}</span>
+              ) : null}
             </>
           ) : (
-            <span>No due date</span>
+            <span className="inline-flex items-center gap-2 text-slate-400">
+              <CalendarIcon className="h-3.5 w-3.5" aria-hidden />
+              No due date
+            </span>
           )}
-          {effortDescription ? <span>{effortDescription}</span> : null}
-          {task.project ? <span className="text-indigo-600">Project: {task.project}</span> : null}
+          {effortDescription ? (
+            <span className="inline-flex items-center gap-2">
+              <ClockIcon className="h-3.5 w-3.5" aria-hidden />
+              {effortDescription}
+            </span>
+          ) : null}
+          {task.project ? (
+            <Badge variant="default" className="mt-1">
+              {task.project}
+            </Badge>
+          ) : null}
         </div>
-      </header>
+      </CardHeader>
 
-      {task.notes ? (
-        <p className="text-sm leading-6 text-slate-600">{task.notes}</p>
-      ) : (
-        <p className="text-sm text-slate-400">No notes yet.</p>
-      )}
+      <CardContent className="space-y-4">
+        {task.notes ? (
+          <p className="text-sm leading-6 text-slate-600">{task.notes}</p>
+        ) : (
+          <p className="text-sm text-slate-400">No notes yet.</p>
+        )}
 
-      <div className="flex flex-wrap gap-2">
-        {task.tags.map(tag => (
-          <span
-            key={tag}
-            className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600"
-          >
-            #{tag}
-          </span>
-        ))}
-        {task.tags.length === 0 ? (
-          <span className="text-xs text-slate-400">No tags</span>
-        ) : null}
-      </div>
+        <div className="flex flex-wrap gap-2">
+          {task.tags.map(tag => (
+            <Badge
+              key={tag}
+              variant="secondary"
+              className="inline-flex items-center gap-1 text-xs font-medium"
+            >
+              <TagIcon className="h-3 w-3" aria-hidden />
+              {tag}
+            </Badge>
+          ))}
+          {task.tags.length === 0 ? (
+            <span className="text-xs text-slate-400">No tags</span>
+          ) : null}
+        </div>
+      </CardContent>
 
-      <footer className="flex flex-wrap items-center gap-3">
-        <button
+      <CardFooter className="flex flex-wrap items-center gap-3">
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={() => mutateTask({ archived: !task.archived })}
           disabled={isPending}
-          className="inline-flex items-center rounded-md border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
         >
+          {isPending ? (
+            <LoaderIcon className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+          ) : task.archived ? (
+            <RestoreIcon className="mr-2 h-4 w-4" aria-hidden />
+          ) : (
+            <ArchiveIcon className="mr-2 h-4 w-4" aria-hidden />
+          )}
           {task.archived ? 'Restore' : 'Archive'}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="destructive"
+          size="sm"
           onClick={handleDelete}
-          className="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
         >
+          <TrashIcon className="mr-2 h-4 w-4" aria-hidden />
           Delete
-        </button>
+        </Button>
         <Link
           href={`/tasks/${task.id}`}
-          className="ml-auto inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'ml-auto')}
         >
           Open
+          <ArrowRightIcon className="ml-2 h-4 w-4" aria-hidden />
         </Link>
-      </footer>
-    </article>
+      </CardFooter>
+    </Card>
   );
 }

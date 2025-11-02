@@ -1,8 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { LoaderIcon, PlusIcon } from '@/components/icons';
 
 type QuickAddState = {
   status: 'idle' | 'success' | 'error';
@@ -17,7 +21,9 @@ interface QuickAddFormProps {
 
 export function QuickAddForm({ action }: QuickAddFormProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
   const [state, formAction] = useFormState(action, initialState);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     if (state.status === 'success') {
@@ -26,30 +32,75 @@ export function QuickAddForm({ action }: QuickAddFormProps) {
         inputRef.current.value = '';
         inputRef.current.focus();
       }
+      if (contentRef.current) {
+        contentRef.current.value = '';
+      }
+      setExpanded(false);
     } else if (state.status === 'error' && state.message) {
       toast.error(state.message);
     }
   }, [state]);
 
+  const handleCollapse = () => {
+    setExpanded(false);
+    if (contentRef.current) {
+      contentRef.current.value = '';
+    }
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
   return (
     <form
       action={formAction}
-      className="flex flex-col gap-2 sm:flex-row sm:items-center"
+      className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
       data-testid="quick-add-form"
     >
-      <label htmlFor="quick-add-input" className="sr-only">
-        Quick add note
-      </label>
-      <input
-        ref={inputRef}
-        id="quick-add-input"
-        name="quickAdd"
-        placeholder='Capture something… e.g. "Prep agenda #focus"'
-        className="flex-1 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-        autoComplete="off"
-        data-testid="quick-add-input"
-      />
-      <SubmitButton />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <label htmlFor="quick-add-input" className="sr-only">
+          Quick add note
+        </label>
+        <Input
+          ref={inputRef}
+          id="quick-add-input"
+          name="quickAdd"
+          placeholder='Capture something… e.g. "Prep agenda #focus"'
+          className="flex-1"
+          autoComplete="off"
+          data-testid="quick-add-input"
+          onFocus={() => setExpanded(true)}
+        />
+        {!expanded ? <SubmitButton /> : null}
+      </div>
+      {expanded ? (
+        <div className="space-y-2">
+          <label htmlFor="quick-add-content" className="text-sm font-medium text-slate-700">
+            Content
+          </label>
+          <Textarea
+            ref={contentRef}
+            id="quick-add-content"
+            name="quickAddContent"
+            rows={4}
+            placeholder="Add details or markdown…"
+            className="leading-6"
+            data-testid="quick-add-content"
+          />
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleCollapse}
+              data-testid="quick-add-cancel"
+            >
+              Cancel
+            </Button>
+            <SubmitButton />
+          </div>
+        </div>
+      ) : null}
     </form>
   );
 }
@@ -58,13 +109,24 @@ function SubmitButton() {
   const { pending } = useFormStatus();
 
   return (
-    <button
+    <Button
       type="submit"
-      className="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
-      disabled={pending}
+      size="sm"
+      className="min-w-[110px]"
+      isLoading={pending}
       data-testid="quick-add-submit"
     >
-      {pending ? 'Adding…' : 'Add'}
-    </button>
+      {pending ? (
+        <span className="inline-flex items-center gap-2">
+          <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
+          Adding…
+        </span>
+      ) : (
+        <span className="inline-flex items-center gap-2">
+          <PlusIcon className="h-4 w-4" aria-hidden />
+          Add
+        </span>
+      )}
+    </Button>
   );
 }

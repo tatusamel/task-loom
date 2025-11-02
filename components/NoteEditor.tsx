@@ -4,6 +4,21 @@ import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
+import {
+  ArchiveIcon,
+  ArrowLeftIcon,
+  EyeIcon,
+  LoaderIcon,
+  PenIcon,
+  PinIcon,
+  RestoreIcon,
+  TrashIcon,
+} from '@/components/icons';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { TagInput } from './TagInput';
 import type { NoteDTO } from '@/types/note';
 import { renderMarkdown } from '@/lib/markdown';
@@ -29,7 +44,7 @@ export function NoteEditor({ note }: NoteEditorProps) {
   const [pinned, setPinned] = useState(note.pinned);
   const [archived, setArchived] = useState(note.archived);
   const [isSaving, setIsSaving] = useState(false);
-  const [isPreview, setIsPreview] = useState(false);
+  const [isPreview, setIsPreview] = useState(true);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const markdownPreview = useMemo(() => renderMarkdown(content || ''), [content]);
@@ -133,55 +148,66 @@ export function NoteEditor({ note }: NoteEditorProps) {
         <div>
           <Link
             href="/notes"
-            className="text-sm font-medium text-indigo-600 transition hover:text-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 transition hover:text-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
           >
-            ← Back to notes
+            <ArrowLeftIcon className="h-4 w-4" aria-hidden />
+            Back to notes
           </Link>
           <p className="mt-2 text-xs text-slate-400">
             Last updated {new Date(note.updatedAt).toLocaleString()}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             type="button"
+            variant={pinned ? 'secondary' : 'outline'}
+            size="sm"
             onClick={handlePinToggle}
             aria-pressed={pinned}
-            className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             data-testid="note-editor-pin"
           >
+            <PinIcon className="mr-2 h-4 w-4" aria-hidden />
             {pinned ? 'Unpin' : 'Pin'}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={handleArchiveToggle}
             aria-pressed={archived}
-            className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             data-testid="note-editor-archive"
           >
+            {archived ? (
+              <RestoreIcon className="mr-2 h-4 w-4" aria-hidden />
+            ) : (
+              <ArchiveIcon className="mr-2 h-4 w-4" aria-hidden />
+            )}
             {archived ? 'Restore' : 'Archive'}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="destructive"
+            size="sm"
             onClick={handleDelete}
-            className="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
             data-testid="note-editor-delete"
           >
+            <TrashIcon className="mr-2 h-4 w-4" aria-hidden />
             Delete
-          </button>
+          </Button>
         </div>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
         <div>
-          <label htmlFor="note-title" className="block text-sm font-semibold text-slate-700">
+          <Label htmlFor="note-title" className="block text-sm font-semibold text-slate-700">
             Title
-          </label>
-          <input
+          </Label>
+          <Input
             id="note-title"
             name="title"
             value={title}
             onChange={event => setTitle(event.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2 text-base font-semibold text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="mt-1 w-full text-base font-semibold"
             placeholder="Untitled note"
             data-testid="note-editor-title"
           />
@@ -189,34 +215,44 @@ export function NoteEditor({ note }: NoteEditorProps) {
 
         <div>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
-            <label htmlFor="note-content" className="block text-sm font-semibold text-slate-700">
+            <Label htmlFor="note-content" className="block text-sm font-semibold text-slate-700">
               Markdown
-            </label>
+            </Label>
             <div className="inline-flex rounded-md border border-slate-200 bg-white p-1 text-sm font-medium text-slate-600 shadow-sm">
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 className={cn(
-                  'rounded-sm px-3 py-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
-                  !isPreview ? 'bg-indigo-600 text-white shadow' : 'hover:bg-slate-100',
-                )}
-                onClick={() => setIsPreview(false)}
-                aria-pressed={!isPreview}
-                data-testid="note-editor-preview-toggle-edit"
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                className={cn(
-                  'rounded-sm px-3 py-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
-                  isPreview ? 'bg-indigo-600 text-white shadow' : 'hover:bg-slate-100',
+                  'rounded-sm px-3 py-1 text-sm font-medium',
+                  isPreview
+                    ? '!bg-indigo-600 !text-white hover:!bg-indigo-500 hover:!text-white'
+                    : '!text-black hover:!bg-gray-200 hover:!text-black',
                 )}
                 onClick={() => setIsPreview(true)}
                 aria-pressed={isPreview}
                 data-testid="note-editor-preview-toggle-preview"
               >
+                <EyeIcon className="mr-2 h-4 w-4" aria-hidden />
                 Preview
-              </button>
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'rounded-sm px-3 py-1 text-sm font-medium',
+                  !isPreview
+                    ? '!bg-indigo-600 !text-white hover:!bg-indigo-500 hover:!text-white'
+                    : '!text-black hover:!bg-gray-200 hover:!text-black',
+                )}
+                onClick={() => setIsPreview(false)}
+                aria-pressed={!isPreview}
+                data-testid="note-editor-preview-toggle-edit"
+              >
+                <PenIcon className="mr-2 h-4 w-4" aria-hidden />
+                Edit
+              </Button>
             </div>
             <p className="text-xs text-slate-400">
               Toggle to preview rendered Markdown before saving.
@@ -228,13 +264,13 @@ export function NoteEditor({ note }: NoteEditorProps) {
               dangerouslySetInnerHTML={{ __html: markdownPreview }}
             />
           ) : (
-            <textarea
+            <Textarea
               id="note-content"
               name="content"
               value={content}
               onChange={event => setContent(event.target.value)}
               rows={12}
-              className="mt-2 w-full rounded-md border border-slate-200 px-3 py-2 text-sm leading-6 text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="mt-2 w-full text-sm leading-6"
               placeholder="Write in Markdown..."
               data-testid="note-editor-content"
             />
@@ -247,23 +283,26 @@ export function NoteEditor({ note }: NoteEditorProps) {
         </div>
 
         {statusMessage ? (
-          <div
-            className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700"
-            data-testid="note-editor-status"
-          >
+          <Badge variant="success" className="px-3 py-2 text-sm" data-testid="note-editor-status">
             {statusMessage}
-          </div>
+          </Badge>
         ) : null}
 
         <div className="flex items-center gap-3">
-          <button
+          <Button
             type="submit"
-            className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
             disabled={isSaving}
             data-testid="note-editor-save"
           >
-            {isSaving ? 'Saving…' : 'Save changes'}
-          </button>
+            {isSaving ? (
+              <span className="inline-flex items-center gap-2">
+                <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
+                Saving…
+              </span>
+            ) : (
+              'Save changes'
+            )}
+          </Button>
           <span className="text-xs text-slate-400">
             Keyboard-friendly: Tab through inputs, Enter to save.
           </span>
