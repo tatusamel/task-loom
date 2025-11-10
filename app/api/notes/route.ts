@@ -5,6 +5,10 @@ import { createNoteSchema, noteQuerySchema } from '@/lib/validation';
 import { getNotes, noteRelations, serializeNote } from '@/lib/notes';
 import { ensureTagsExist, normalizeTags } from '@/lib/tags';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const raw = {

@@ -5,6 +5,10 @@ import { noteRelations, serializeNote } from '@/lib/notes';
 import { ensureTagsExist, normalizeTags } from '@/lib/tags';
 import { updateNoteSchema } from '@/lib/validation';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 interface RouteParams {
   params: { id: string };
 }

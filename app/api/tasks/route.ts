@@ -4,6 +4,10 @@ import { taskQuerySchema, createTaskSchema } from '@/lib/validation';
 import { parseDateTimeInput } from '@/lib/utils';
 import { createTask, getTasks } from '@/lib/tasks';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const raw = {

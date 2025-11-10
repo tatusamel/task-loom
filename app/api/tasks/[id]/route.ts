@@ -4,6 +4,10 @@ import { parseDateTimeInput } from '@/lib/utils';
 import { deleteTask, getTaskById, updateTask } from '@/lib/tasks';
 import { updateTaskSchema } from '@/lib/validation';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 interface RouteParams {
   params: { id: string };
 }
