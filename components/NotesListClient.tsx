@@ -26,6 +26,7 @@ interface NotesListClientProps {
   initialQuery: string;
   initialTag: string;
   initialStatus: NoteStatus;
+  availableTags: string[];
 }
 
 function FilterField({
@@ -61,8 +62,10 @@ export function NotesListClient({
   initialQuery,
   initialTag,
   initialStatus,
+  availableTags: _availableTags,
 }: NotesListClientProps) {
-
+  const tagPlaceholder =
+    _availableTags.length > 0 ? `Try “${_availableTags[0]}”` : 'Type a tag…';
   const router = useRouter();
   const pathname = usePathname();
 
@@ -225,7 +228,7 @@ export function NotesListClient({
             </FilterField>
 
             <FilterField label="Tag" className="w-full md:w-[200px]">
-              <TagInput value={tagTokens} onChange={handleTagsChange} placeholder="Type a tag…" />
+              <TagInput value={tagTokens} onChange={handleTagsChange} placeholder={tagPlaceholder} />
             </FilterField>
 
             <FilterField label="Status" className="w-full md:w-[160px]">
