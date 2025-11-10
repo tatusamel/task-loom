@@ -5,6 +5,9 @@ import { EmptyState } from '@/components/EmptyState';
 import { createQuickNoteAction } from './actions';
 import { getPinnedNotes, getRecentNotes } from '@/lib/notes';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function HomePage() {
   const [pinnedNotes, recentNotesRaw] = await Promise.all([
     getPinnedNotes(),

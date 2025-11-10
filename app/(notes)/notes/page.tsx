@@ -2,6 +2,9 @@ import { NotesListClient } from '@/components/NotesListClient';
 import { getAllTags, getNotes } from '@/lib/notes';
 import { NoteStatus } from '@/types/note';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface NotesPageProps {
   searchParams?: {
     query?: string;

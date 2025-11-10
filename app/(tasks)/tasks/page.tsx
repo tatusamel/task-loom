@@ -3,6 +3,9 @@ import { getTasks } from '@/lib/tasks';
 import { getAllTags } from '@/lib/tags';
 import type { TaskStatusFilter } from '@/types/task';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface TasksPageProps {
   searchParams?: {
     status?: TaskStatusFilter;
