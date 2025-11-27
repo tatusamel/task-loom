@@ -46,7 +46,7 @@ export function TagInput({ value, onChange, placeholder }: TagInputProps) {
     <div
       onClick={handleContainerClick}
       className={cn(
-        'flex min-h-[44px] w-full items-center gap-2 rounded-lg border border-slate-200 bg-white/80 px-3 text-sm text-slate-900 transition-all duration-150 cursor-text hover:border-slate-300 hover:bg-white',
+        'flex min-h-[44px] w-full flex-wrap items-center gap-2 rounded-lg border border-slate-200 bg-white/80 px-3 py-2 text-sm text-slate-900 transition-all duration-150 cursor-text hover:border-slate-300 hover:bg-white',
         isFocused && 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-soft',
       )}
     >

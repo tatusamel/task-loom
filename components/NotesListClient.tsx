@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { TagInput } from '@/components/TagInput';
+import { TagFilterPopover } from '@/components/TagFilterPopover';
 import { NoteCard } from './NoteCard';
 import { SearchBar } from './SearchBar';
 import { EmptyState } from './EmptyState';
@@ -63,8 +63,6 @@ export function NotesListClient({
   initialStatus,
   availableTags: _availableTags,
 }: NotesListClientProps) {
-  const tagPlaceholder =
-    _availableTags.length > 0 ? `Try “${_availableTags[0]}”` : 'Type a tag…';
   const router = useRouter();
   const pathname = usePathname();
 
@@ -265,10 +263,10 @@ export function NotesListClient({
               </FilterField>
 
               <FilterField label="Tag" className="sm:col-span-1">
-                <TagInput
+                <TagFilterPopover
                   value={tagTokens}
                   onChange={handleTagsChange}
-                  placeholder={tagPlaceholder}
+                  placeholder="Filter by tags..."
                 />
               </FilterField>
 
