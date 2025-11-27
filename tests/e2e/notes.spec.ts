@@ -1,7 +1,18 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
+
+async function signIn(page: Page) {
+  const email = process.env.E2E_USER_EMAIL ?? 'demo@taskloom.app';
+  const password = process.env.E2E_USER_PASSWORD ?? 'demo123';
+
+  await page.goto('/sign-in');
+  await page.getByLabel('Email').fill(email);
+  await page.getByLabel('Password').fill(password);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.waitForURL(url => url.pathname === '/');
+}
 
 test('user captures and manages a note end-to-end', async ({ page }, testInfo) => {
-  await page.goto('/');
+  await signIn(page);
 
   const quickInput = page.getByTestId('quick-add-input');
   await quickInput.fill('Playwright walkthrough #testing #automation');

@@ -4,16 +4,28 @@ import prisma from '@/lib/prisma';
 import { createNoteSchema, noteQuerySchema } from '@/lib/validation';
 import { getNotes, noteRelations, serializeNote } from '@/lib/notes';
 import { ensureTagsExist, normalizeTags } from '@/lib/tags';
+import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const searchParams = request.nextUrl.searchParams;
+  const tagParams = [
+    ...searchParams.getAll('tag'),
+    ...(searchParams.get('tags') ? [searchParams.get('tags') as string] : []),
+  ];
   const raw = {
     query: searchParams.get('query') ?? undefined,
-    tag: searchParams.get('tag') ?? undefined,
+    tags: tagParams,
     status: searchParams.get('status') ?? undefined,
   };
 
@@ -23,12 +35,19 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const notes = await getNotes(parsed.data);
+  const notes = await getNotes({ userId, ...parsed.data });
 
   return NextResponse.json({ notes });
 }
 
 export async function POST(request: NextRequest) {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const body = await request.json().catch(() => null);
 
   const parsed = createNoteSchema.safeParse(body);
@@ -40,10 +59,11 @@ export async function POST(request: NextRequest) {
   }
 
   const tagNames = normalizeTags(parsed.data.tags ?? []);
-  await ensureTagsExist(tagNames);
+  await ensureTagsExist(userId, tagNames);
 
   const note = await prisma.note.create({
     data: {
+      userId,
       title: parsed.data.title,
       content: parsed.data.content ?? '',
       pinned: parsed.data.pinned ?? false,
@@ -51,7 +71,12 @@ export async function POST(request: NextRequest) {
       tags:
         tagNames.length > 0
           ? {
-              connect: tagNames.map(name => ({ name })),
+              connect: tagNames.map(name => ({
+                userId_name: {
+                  userId,
+                  name,
+                },
+              })),
             }
           : undefined,
     },

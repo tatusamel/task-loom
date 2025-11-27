@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { parseDateTimeInput } from '@/lib/utils';
 import { deleteTask, getTaskById, updateTask } from '@/lib/tasks';
 import { updateTaskSchema } from '@/lib/validation';
+import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -13,7 +14,14 @@ interface RouteParams {
 }
 
 export async function GET(_: NextRequest, { params }: RouteParams) {
-  const task = await getTaskById(params.id);
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const task = await getTaskById(userId, params.id);
   if (!task) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
@@ -22,6 +30,13 @@ export async function GET(_: NextRequest, { params }: RouteParams) {
 }
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const json = await request.json().catch(() => null);
   const parsed = updateTaskSchema.safeParse(json);
 
@@ -42,7 +57,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     );
   }
 
-  const task = await updateTask(params.id, {
+  const task = await updateTask(userId, params.id, {
     title: parsed.data.title,
     notes: parsed.data.notes,
     dueAt,
@@ -61,7 +76,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 }
 
 export async function DELETE(_: NextRequest, { params }: RouteParams) {
-  await deleteTask(params.id);
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  await deleteTask(userId, params.id);
   revalidatePath('/tasks');
   return NextResponse.json({ ok: true });
 }

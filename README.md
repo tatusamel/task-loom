@@ -91,6 +91,58 @@ Tags live in a lightweight `Tag` table joined to notes and tasks (SQLite doesnâ€
 
   Screenshots live in the Playwright report (`playwright-report/`) or as attachments in CI.
 
+## Docker Setup
+
+Run the app with Docker Compose (PostgreSQL database included):
+
+```bash
+# 1. Build the images
+docker compose build
+
+# 2. Start the database
+docker compose up -d db
+
+# 3. Run migrations (creates tables)
+docker compose --profile setup run --rm migrate
+
+# 4. Seed the database (creates initial user)
+docker compose --profile setup run --rm seed
+
+# 5. Start the app
+docker compose up -d app
+```
+
+The app runs at [http://localhost:3000](http://localhost:3000).
+
+**Default credentials:**
+- Email: `serhat@taskloom.app`
+- Password: `serhat`
+
+To customize, set `SEED_USER_EMAIL` and `SEED_USER_PASSWORD` in your `.env` file before seeding.
+
+### Docker Commands Reference
+
+| Command | Description |
+| ------- | ----------- |
+| `docker compose up -d` | Start all services (db + app) |
+| `docker compose down` | Stop all services |
+| `docker compose logs -f app` | Follow app logs |
+| `docker compose --profile setup run --rm migrate` | Run database migrations |
+| `docker compose --profile setup run --rm seed` | Seed the database |
+
+### Starting Fresh
+
+To reset everything and start from scratch:
+
+```bash
+docker compose down -v  # Stop and remove volumes (deletes database)
+docker compose build --no-cache  # Rebuild images
+docker compose up -d db
+docker compose --profile setup run --rm migrate
+docker compose --profile setup run --rm seed
+docker compose up -d app
+```
+
 ## Checklist for Next Iteration
 
 - [ ] Model tasks linked to notes and surface task status chips.

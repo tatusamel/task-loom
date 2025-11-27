@@ -89,9 +89,9 @@ export function TaskCard({ task }: TaskCardProps) {
               aria-pressed={task.completed}
             >
               {isPending ? (
-                <LoaderIcon className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+                <LoaderIcon className="mr-1.5 h-4 w-4 animate-spin" aria-hidden />
               ) : (
-                <CheckIcon className="mr-2 h-4 w-4" aria-hidden />
+                <CheckIcon className="mr-1.5 h-4 w-4" aria-hidden />
               )}
               {task.completed ? 'Mark active' : 'Mark complete'}
             </Button>
@@ -154,12 +154,8 @@ export function TaskCard({ task }: TaskCardProps) {
 
         <div className="flex flex-wrap gap-2">
           {task.tags.map(tag => (
-            <Badge
-              key={tag}
-              variant="secondary"
-              className="inline-flex items-center gap-1 text-xs font-medium"
-            >
-              <TagIcon className="h-3 w-3" aria-hidden />
+            <Badge key={tag} variant="secondary">
+              <TagIcon className="h-3 w-3 text-slate-400" aria-hidden />
               {tag}
             </Badge>
           ))}
@@ -169,7 +165,7 @@ export function TaskCard({ task }: TaskCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-wrap items-center gap-3">
+      <CardFooter className="flex flex-wrap items-center gap-2">
         <Button
           type="button"
           variant="outline"
@@ -178,11 +174,11 @@ export function TaskCard({ task }: TaskCardProps) {
           disabled={isPending}
         >
           {isPending ? (
-            <LoaderIcon className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+            <LoaderIcon className="mr-1.5 h-4 w-4 animate-spin" aria-hidden />
           ) : task.archived ? (
-            <RestoreIcon className="mr-2 h-4 w-4" aria-hidden />
+            <RestoreIcon className="mr-1.5 h-4 w-4" aria-hidden />
           ) : (
-            <ArchiveIcon className="mr-2 h-4 w-4" aria-hidden />
+            <ArchiveIcon className="mr-1.5 h-4 w-4" aria-hidden />
           )}
           {task.archived ? 'Restore' : 'Archive'}
         </Button>
@@ -192,15 +188,15 @@ export function TaskCard({ task }: TaskCardProps) {
           size="sm"
           onClick={handleDelete}
         >
-          <TrashIcon className="mr-2 h-4 w-4" aria-hidden />
+          <TrashIcon className="mr-1.5 h-4 w-4" aria-hidden />
           Delete
         </Button>
         <Link
           href={`/tasks/${task.id}`}
-          className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'ml-auto')}
+          className={cn(buttonVariants({ variant: 'default', size: 'sm' }), 'ml-auto')}
         >
           Open
-          <ArrowRightIcon className="ml-2 h-4 w-4" aria-hidden />
+          <ArrowRightIcon className="ml-1.5 h-4 w-4" aria-hidden />
         </Link>
       </CardFooter>
     </Card>

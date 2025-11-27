@@ -7,9 +7,9 @@ import { SearchBar } from './SearchBar';
 import { EmptyState } from './EmptyState';
 import { TaskCard } from './TaskCard';
 import { TaskCreateForm } from './TaskCreateForm';
-import { ListChecksIcon, TagIcon } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -20,6 +20,28 @@ import {
 } from '@/components/ui/select';
 import { TagInput } from '@/components/TagInput';
 import type { TaskDTO, TaskStatusFilter } from '@/types/task';
+import { cn } from '@/lib/utils';
+
+function FilterField({
+  label,
+  children,
+  className,
+  htmlFor,
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+  htmlFor?: string;
+}) {
+  return (
+    <div className={cn('flex w-full flex-col gap-1.5 sm:w-auto', className)}>
+      <label htmlFor={htmlFor} className="text-sm font-medium text-slate-700">
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
 
 interface TaskListClientProps {
   initialTasks: TaskDTO[];
@@ -94,47 +116,45 @@ export function TaskListClient({
     return () => clearTimeout(timer);
   }, [fetchTasks]);
 
+  const filtersDirty = query.trim() !== '' || activeTag !== '' || status !== 'all' || project.trim() !== '';
+
+  const handleResetFilters = useCallback(() => {
+    setQuery('');
+    setTagTokens([]);
+    setStatus('all');
+    setProject('');
+  }, []);
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <TaskCreateForm onCreated={fetchTasks} />
 
       <Card>
-        <CardHeader className="space-y-4 p-6 pb-6">
-          <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
-            <div className="flex-1 min-w-[220px] md:self-stretch md:pt-1">
+        <CardHeader className="p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
+            <FilterField label="Search" className="flex-1 min-w-[200px]">
               <SearchBar
                 value={query}
                 onChange={setQuery}
-                placeholder="Search tasks by title, notes, or project…"
+                placeholder="Search tasks…"
                 testId="tasks-search-input"
               />
-            </div>
-            <div className="flex w-full flex-col gap-1 md:w-[220px] md:self-stretch">
-              <span className="inline-flex items-center gap-2 font-medium text-slate-700">
-                <TagIcon className="h-3.5 w-3.5 text-slate-500" aria-hidden />
-                Tag
-              </span>
-              <div className="max-w-xs pt-1">
-                <TagInput
-                  value={tagTokens}
-                  onChange={next => setTagTokens(next.slice(0, 1))}
-                  placeholder="Type a tag…"
-                />
-              </div>
-            </div>
-            <label
-              className="flex w-full flex-col gap-1 md:w-[180px] md:self-stretch"
-              htmlFor="tasks-status-filter"
-            >
-              <span className="font-medium text-slate-700">Status</span>
+            </FilterField>
+
+            <FilterField label="Tag" className="w-full lg:w-[180px]">
+              <TagInput
+                value={tagTokens}
+                onChange={next => setTagTokens(next.slice(0, 1))}
+                placeholder="Type a tag…"
+              />
+            </FilterField>
+
+            <FilterField label="Status" htmlFor="tasks-status-filter" className="w-full lg:w-[140px]">
               <Select value={status} onValueChange={value => setStatus(value as TaskStatusFilter)}>
-                <SelectTrigger
-                  id="tasks-status-filter"
-                  aria-label="Filter tasks by status"
-                >
+                <SelectTrigger id="tasks-status-filter" aria-label="Filter tasks by status">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
-                <SelectContent align="start">
+                <SelectContent>
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
@@ -142,27 +162,34 @@ export function TaskListClient({
                   <SelectItem value="upcoming">Upcoming</SelectItem>
                 </SelectContent>
               </Select>
-            </label>
-            <label
-              className="flex w-full flex-col gap-1 md:w-[200px]"
-              htmlFor="tasks-project-filter"
-            >
-              <span className="font-medium text-slate-700">Project</span>
+            </FilterField>
+
+            <FilterField label="Project" htmlFor="tasks-project-filter" className="w-full lg:w-[160px]">
               <Input
                 id="tasks-project-filter"
                 value={project}
                 onChange={event => setProject(event.target.value)}
                 placeholder="Project name"
               />
-            </label>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-            <Badge variant="secondary" className="inline-flex items-center gap-2">
-              <ListChecksIcon className="h-3.5 w-3.5" aria-hidden />
-              {loading ? 'Loading tasks…' : `${tasks.length} task${tasks.length === 1 ? '' : 's'}`}
-            </Badge>
+            </FilterField>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="default"
+              onClick={handleResetFilters}
+              disabled={!filtersDirty}
+              className="h-10 self-end"
+            >
+              Clear filters
+            </Button>
           </div>
         </CardHeader>
+        <CardContent className="border-t border-slate-100 pt-4">
+          <Badge variant="secondary">
+            {loading ? 'Loading…' : `${tasks.length} task${tasks.length === 1 ? '' : 's'}`}
+          </Badge>
+        </CardContent>
       </Card>
 
       <section className="grid gap-4 lg:grid-cols-2">

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -183,18 +184,41 @@ function normalizeTags(tags: string[]): string[] {
 }
 
 async function main() {
+  await prisma.session.deleteMany();
+  await prisma.account.deleteMany();
+  await prisma.verificationToken.deleteMany();
   await prisma.task.deleteMany();
   await prisma.note.deleteMany();
   await prisma.tag.deleteMany();
+  await prisma.user.deleteMany();
+
+  const seedEmail = process.env.SEED_USER_EMAIL?.toLowerCase() ?? 'demo@taskloom.app';
+  const seedPassword = process.env.SEED_USER_PASSWORD ?? 'demo123';
+
+  const demoUser = await prisma.user.create({
+    data: {
+      name: 'Demo User',
+      email: seedEmail,
+      password: await bcrypt.hash(seedPassword, 12),
+    },
+  });
 
   for (const note of seedNotes) {
     const normalizedTags = normalizeTags(note.tags);
 
     for (const name of normalizedTags) {
       await prisma.tag.upsert({
-        where: { name },
+        where: {
+          userId_name: {
+            userId: demoUser.id,
+            name,
+          },
+        },
         update: {},
-        create: { name },
+        create: {
+          name,
+          userId: demoUser.id,
+        },
       });
     }
 
@@ -204,10 +228,16 @@ async function main() {
         content: note.content,
         pinned: note.pinned,
         archived: note.archived,
+        userId: demoUser.id,
         tags:
           normalizedTags.length > 0
             ? {
-                connect: normalizedTags.map(name => ({ name })),
+                connect: normalizedTags.map(name => ({
+                  userId_name: {
+                    userId: demoUser.id,
+                    name,
+                  },
+                })),
               }
             : undefined,
       },
@@ -218,9 +248,17 @@ async function main() {
     const normalizedTags = normalizeTags(task.tags);
     for (const name of normalizedTags) {
       await prisma.tag.upsert({
-        where: { name },
+        where: {
+          userId_name: {
+            userId: demoUser.id,
+            name,
+          },
+        },
         update: {},
-        create: { name },
+        create: {
+          name,
+          userId: demoUser.id,
+        },
       });
     }
 
@@ -234,10 +272,16 @@ async function main() {
         project: task.project,
         completed: task.completed,
         archived: task.archived,
+        userId: demoUser.id,
         tags:
           normalizedTags.length > 0
             ? {
-                connect: normalizedTags.map(name => ({ name })),
+                connect: normalizedTags.map(name => ({
+                  userId_name: {
+                    userId: demoUser.id,
+                    name,
+                  },
+                })),
               }
             : undefined,
       },

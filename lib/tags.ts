@@ -16,7 +16,7 @@ export function normalizeTags(tags: string[] = []): string[] {
   return normalized;
 }
 
-export async function ensureTagsExist(tags: string[]): Promise<void> {
+export async function ensureTagsExist(userId: string, tags: string[]): Promise<void> {
   if (tags.length === 0) {
     return;
   }
@@ -24,17 +24,23 @@ export async function ensureTagsExist(tags: string[]): Promise<void> {
   await Promise.all(
     tags.map(name =>
       prisma.tag.upsert({
-        where: { name },
+        where: {
+          userId_name: {
+            userId,
+            name,
+          },
+        },
         update: {},
-        create: { name },
+        create: { name, userId },
       }),
     ),
   );
 }
 
-export async function getAllTags(): Promise<string[]> {
+export async function getAllTags(userId: string): Promise<string[]> {
   const tags = await prisma.tag.findMany({
     select: { name: true },
+    where: { userId },
     orderBy: { name: 'asc' },
   });
 

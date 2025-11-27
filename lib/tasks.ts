@@ -31,15 +31,18 @@ export function serializeTask(
 }
 
 type TaskFilters = {
+  userId: string;
   status?: TaskStatusFilter;
   tag?: string;
   project?: string;
   query?: string;
 };
 
-export async function getTasks(filters: TaskFilters = {}): Promise<TaskDTO[]> {
-  const { status = 'all', tag, project, query } = filters;
-  const where: Prisma.TaskWhereInput = {};
+export async function getTasks(filters: TaskFilters): Promise<TaskDTO[]> {
+  const { userId, status = 'all', tag, project, query } = filters;
+  const where: Prisma.TaskWhereInput = {
+    userId,
+  };
 
   if (status === 'active') {
     where.completed = false;
@@ -59,7 +62,7 @@ export async function getTasks(filters: TaskFilters = {}): Promise<TaskDTO[]> {
 
   if (tag) {
     where.tags = {
-      some: { name: tag },
+      some: { name: tag, userId },
     };
   }
 
@@ -88,31 +91,35 @@ export async function getTasks(filters: TaskFilters = {}): Promise<TaskDTO[]> {
   return tasks.map(serializeTask);
 }
 
-export async function getTaskById(id: string): Promise<TaskDTO | null> {
+export async function getTaskById(userId: string, id: string): Promise<TaskDTO | null> {
   const task = await prisma.task.findUnique({
-    where: { id },
+    where: { id_userId: { id, userId } },
     include: taskInclude,
   });
 
   return task ? serializeTask(task) : null;
 }
 
-export async function createTask(data: {
-  title: string;
-  notes?: string | null;
-  dueAt?: Date | null;
-  estimatedEffort?: number | null;
-  importance?: number | null;
-  project?: string | null;
-  tags?: string[] | null;
-  completed?: boolean;
-  archived?: boolean;
-}): Promise<TaskDTO> {
+export async function createTask(
+  userId: string,
+  data: {
+    title: string;
+    notes?: string | null;
+    dueAt?: Date | null;
+    estimatedEffort?: number | null;
+    importance?: number | null;
+    project?: string | null;
+    tags?: string[] | null;
+    completed?: boolean;
+    archived?: boolean;
+  },
+): Promise<TaskDTO> {
   const normalizedTags = normalizeTags(data.tags ?? []);
-  await ensureTagsExist(normalizedTags);
+  await ensureTagsExist(userId, normalizedTags);
 
   const task = await prisma.task.create({
     data: {
+      userId,
       title: data.title,
       notes: data.notes ?? null,
       dueAt: data.dueAt ?? null,
@@ -124,7 +131,12 @@ export async function createTask(data: {
       tags:
         normalizedTags.length > 0
           ? {
-              connect: normalizedTags.map(name => ({ name })),
+              connect: normalizedTags.map(name => ({
+                userId_name: {
+                  userId,
+                  name,
+                },
+              })),
             }
           : undefined,
     },
@@ -135,6 +147,7 @@ export async function createTask(data: {
 }
 
 export async function updateTask(
+  userId: string,
   id: string,
   data: {
     title?: string;
@@ -150,11 +163,11 @@ export async function updateTask(
 ): Promise<TaskDTO> {
   const normalizedTags = data.tags ? normalizeTags(data.tags) : undefined;
   if (normalizedTags) {
-    await ensureTagsExist(normalizedTags);
+    await ensureTagsExist(userId, normalizedTags);
   }
 
   const task = await prisma.task.update({
-    where: { id },
+    where: { id_userId: { id, userId } },
     data: {
       ...(data.title !== undefined ? { title: data.title } : {}),
       ...(data.notes !== undefined ? { notes: data.notes } : {}),
@@ -167,7 +180,12 @@ export async function updateTask(
       ...(normalizedTags !== undefined
         ? {
             tags: {
-              set: normalizedTags.map(name => ({ name })),
+              set: normalizedTags.map(name => ({
+                userId_name: {
+                  userId,
+                  name,
+                },
+              })),
             },
           }
         : {}),
@@ -178,8 +196,8 @@ export async function updateTask(
   return serializeTask(task);
 }
 
-export async function deleteTask(id: string): Promise<void> {
-  await prisma.task.delete({ where: { id } });
+export async function deleteTask(userId: string, id: string): Promise<void> {
+  await prisma.task.delete({ where: { id_userId: { id, userId } } });
 }
 
 export const taskRelations = {

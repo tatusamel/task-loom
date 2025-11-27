@@ -1,12 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { ArchiveIcon, RestoreIcon, TagIcon } from '@/components/icons';
+import { ArchiveIcon, RestoreIcon } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import {
   Select,
@@ -24,28 +24,27 @@ import type { NoteDTO, NoteStatus } from '@/types/note';
 interface NotesListClientProps {
   initialNotes: NoteDTO[];
   initialQuery: string;
-  initialTag: string;
+  initialTags: string[];
   initialStatus: NoteStatus;
   availableTags: string[];
 }
 
 function FilterField({
   label,
-  icon,
   children,
   className,
+  htmlFor,
 }: {
   label: string;
-  icon?: ReactNode;
   children: ReactNode;
   className?: string;
+  htmlFor?: string;
 }) {
   return (
-    <div className={cn('flex w-full min-w-[180px] flex-col gap-2 sm:w-auto', className)}>
-      <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-        {icon}
+    <div className={cn('flex w-full flex-col gap-1 sm:w-auto', className)}>
+      <label htmlFor={htmlFor} className="text-xs font-semibold uppercase tracking-wide text-slate-500">
         {label}
-      </span>
+      </label>
       {children}
     </div>
   );
@@ -60,7 +59,7 @@ const statusFilters: Array<{ label: string; value: NoteStatus }> = [
 export function NotesListClient({
   initialNotes,
   initialQuery,
-  initialTag,
+  initialTags,
   initialStatus,
   availableTags: _availableTags,
 }: NotesListClientProps) {
@@ -71,28 +70,40 @@ export function NotesListClient({
 
   const [notes, setNotes] = useState<NoteDTO[]>(initialNotes);
   const [query, setQuery] = useState(initialQuery);
-  const [tagTokens, setTagTokens] = useState<string[]>(initialTag ? [initialTag] : []);
+  const [tagTokens, setTagTokens] = useState<string[]>(initialTags);
   const [status, setStatus] = useState<NoteStatus>(initialStatus || 'active');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
+
+  const statusCounts = useMemo(() => {
+    const counts = { active: 0, archived: 0 };
+    for (const note of notes) {
+      if (note.archived) {
+        counts.archived += 1;
+      } else {
+        counts.active += 1;
+      }
+    }
+    return { ...counts, all: notes.length };
+  }, [notes]);
 
   useEffect(() => {
     setNotes(initialNotes);
   }, [initialNotes]);
   useEffect(() => {
-    setTagTokens(initialTag ? [initialTag] : []);
-  }, [initialTag]);
+    setTagTokens(initialTags);
+  }, [initialTags]);
 
   const hasSelection = selectedIds.size > 0;
-  const activeTag = tagTokens[0] ?? '';
-  const filtersDirty = Boolean(query.trim()) || Boolean(activeTag) || status !== 'active';
+  const activeTags = tagTokens;
+  const filtersDirty = Boolean(query.trim()) || activeTags.length > 0 || status !== 'active';
 
   const handleQueryChange = useCallback((value: string) => {
     setQuery(value);
   }, []);
 
   const handleTagsChange = useCallback((nextTags: string[]) => {
-    setTagTokens(nextTags.slice(0, 1));
+    setTagTokens(nextTags);
   }, []);
 
   const handleStatusChange = useCallback((nextStatus: NoteStatus) => {
@@ -114,7 +125,7 @@ export function NotesListClient({
   const fetchNotes = useCallback(async () => {
     const params = new URLSearchParams();
     if (query.trim()) params.set('query', query.trim());
-    if (activeTag) params.set('tag', activeTag);
+    if (activeTags.length > 0) params.set('tags', activeTags.join(','));
     if (status !== 'active') params.set('status', status);
 
     setLoading(true);
@@ -143,7 +154,7 @@ export function NotesListClient({
     } finally {
       setLoading(false);
     }
-  }, [activeTag, pathname, query, router, status, syncSelection]);
+  }, [activeTags, pathname, query, router, status, syncSelection]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -170,11 +181,11 @@ export function NotesListClient({
   }, []);
 
   const handleResetFilters = useCallback(() => {
-    handleQueryChange('');
-    handleTagsChange([]);
-    handleStatusChange('active');
-    clearSelection();
-  }, [clearSelection, handleQueryChange, handleStatusChange, handleTagsChange]);
+    setQuery('');
+    setTagTokens([]);
+    setStatus('active');
+    setSelectedIds(new Set());
+  }, []);
 
   const handleBulkArchive = async () => {
     if (selectedIds.size === 0) {
@@ -214,65 +225,106 @@ export function NotesListClient({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <Card>
-        <CardHeader className="space-y-0 pb-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:gap-4">
-            <FilterField label="Search" className="flex-1 min-w-[220px]">
-              <SearchBar
-                value={query}
-                onChange={handleQueryChange}
-                placeholder="Search by title or content…"
-                testId="notes-search-input"
-              />
-            </FilterField>
-
-            <FilterField label="Tag" className="w-full md:w-[200px]">
-              <TagInput value={tagTokens} onChange={handleTagsChange} placeholder={tagPlaceholder} />
-            </FilterField>
-
-            <FilterField label="Status" className="w-full md:w-[160px]">
-              <Select value={status} onValueChange={value => handleStatusChange(value as NoteStatus)}>
-                <SelectTrigger
-                  data-testid="status-filter"
-                  aria-label="Filter notes by status"
-                  className="h-10"
-                >
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {statusFilters.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FilterField>
-
-            <div className="flex items-end md:pb-[2px]">
+        <CardHeader className="p-4 pb-3 sm:p-5">
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                <span>Filters</span>
+                {filtersDirty ? (
+                  <Badge variant="secondary" className="hidden sm:inline-flex">
+                    Active
+                  </Badge>
+                ) : (
+                  <span className="hidden text-xs font-normal text-slate-500 sm:inline">
+                    Search, tag, or status
+                  </span>
+                )}
+              </div>
               <Button
                 type="button"
                 variant="ghost"
-                size="default"
+                size="sm"
                 onClick={handleResetFilters}
                 disabled={!filtersDirty}
-                className="h-10"
+                className="h-9"
               >
                 Clear filters
               </Button>
             </div>
+
+            <div className="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr,1fr,0.9fr] xl:grid-cols-[1.6fr,1fr,1fr]">
+              <FilterField label="Search" className="sm:col-span-2 lg:col-span-1">
+                <SearchBar
+                  value={query}
+                  onChange={handleQueryChange}
+                  placeholder="Search notes…"
+                  testId="notes-search-input"
+                />
+              </FilterField>
+
+              <FilterField label="Tag" className="sm:col-span-1">
+                <TagInput
+                  value={tagTokens}
+                  onChange={handleTagsChange}
+                  placeholder={tagPlaceholder}
+                />
+              </FilterField>
+
+              <FilterField label="Status" htmlFor="notes-status-filter" className="sm:col-span-1">
+                <Select value={status} onValueChange={value => handleStatusChange(value as NoteStatus)}>
+                  <SelectTrigger
+                    id="notes-status-filter"
+                    data-testid="status-filter"
+                    aria-label="Filter notes by status"
+                    className="min-w-[180px]"
+                  >
+                    <SelectValue placeholder="Filter by status…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statusFilters.map(option => (
+                      <SelectItem key={option.value} value={option.value} className="pr-8">
+                        <span className="flex w-full items-center justify-between gap-3">
+                          <span>{option.label}</span>
+                          <Badge variant="secondary">
+                            {option.value === 'all'
+                              ? `${statusCounts.all}`
+                              : option.value === 'archived'
+                                ? `${statusCounts.archived}`
+                                : `${statusCounts.active}`}
+                          </Badge>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FilterField>
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-            <Badge variant="secondary">
-              {loading ? 'Loading notes…' : `${notes.length} note${notes.length === 1 ? '' : 's'}`}
+      </Card>
+
+      <div className="rounded-xl border border-slate-200/80 bg-white/80 p-4 shadow-soft">
+        <div
+          className={cn(
+            'flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm text-slate-600',
+            hasSelection && 'border-indigo-200 bg-indigo-50/70 text-indigo-900 shadow-soft',
+          )}
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline" className="bg-white">
+              {loading ? 'Loading…' : `Showing ${notes.length} note${notes.length === 1 ? '' : 's'}`}
             </Badge>
-            {hasSelection ? <span>{selectedIds.size} selected</span> : null}
+            {filtersDirty ? (
+              <span className="text-xs text-indigo-700">Filters applied</span>
+            ) : (
+              <span className="text-xs text-slate-500">All notes</span>
+            )}
           </div>
           {hasSelection ? (
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm">{selectedIds.size} selected</span>
               <Button
                 type="button"
                 size="sm"
@@ -281,40 +333,50 @@ export function NotesListClient({
                 data-testid="bulk-archive"
               >
                 {status === 'archived' ? (
-                  <RestoreIcon className="mr-2 h-4 w-4" aria-hidden />
+                  <RestoreIcon className="mr-1.5 h-4 w-4" aria-hidden />
                 ) : (
-                  <ArchiveIcon className="mr-2 h-4 w-4" aria-hidden />
+                  <ArchiveIcon className="mr-1.5 h-4 w-4" aria-hidden />
                 )}
-                {status === 'archived' ? 'Restore selected' : 'Archive selected'}
+                {status === 'archived' ? 'Restore' : 'Archive'}
               </Button>
-              <Button type="button" size="sm" variant="outline" onClick={clearSelection}>
-                Clear selection
+              <Button type="button" size="sm" variant="ghost" onClick={clearSelection}>
+                Clear
               </Button>
             </div>
-          ) : null}
-        </CardContent>
-      </Card>
+          ) : (
+            <span className="text-xs text-slate-500">
+              Status: {statusFilters.find(option => option.value === status)?.label ?? 'Active'}
+            </span>
+          )}
+        </div>
 
-      <section className="grid gap-4 md:grid-cols-2">
-        {notes.length > 0 ? (
-          notes.map(note => (
-            <NoteCard
-              key={note.id}
-              note={note}
-              selection={{
-                selected: selectedIds.has(note.id),
-                onChange: checked => toggleSelection(note.id, checked),
-              }}
+        {!loading && notes.length <= 1 ? (
+          <div className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+            Only seeing a few notes? Clear filters or add more notes to fill this space.
+          </div>
+        ) : null}
+
+        <section className="mt-4 grid gap-4 md:grid-cols-2">
+          {notes.length > 0 ? (
+            notes.map(note => (
+              <NoteCard
+                key={note.id}
+                note={note}
+                selection={{
+                  selected: selectedIds.has(note.id),
+                  onChange: checked => toggleSelection(note.id, checked),
+                }}
+              />
+            ))
+          ) : (
+            <EmptyState
+              title="No notes match your filters"
+              message="Try adjusting the filters or clear the search to see more notes."
+              className="col-span-full"
             />
-          ))
-        ) : (
-          <EmptyState
-            title="No notes match your filters"
-            message="Try adjusting the filters or clear the search to see more notes."
-            className="col-span-full"
-          />
-        )}
-      </section>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

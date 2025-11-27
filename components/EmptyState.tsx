@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface EmptyStateProps {
   title: string;
@@ -11,17 +10,15 @@ interface EmptyStateProps {
 
 export function EmptyState({ title, message, actionSlot, className }: EmptyStateProps) {
   return (
-    <Card
+    <div
       className={cn(
-        'col-span-full border border-dashed border-slate-200 bg-white text-left',
+        'col-span-full rounded-lg border border-slate-200/80 bg-slate-50/50 px-6 py-8 text-center',
         className,
       )}
     >
-      <CardContent className="flex flex-col gap-2 p-6">
-        <h3 className="text-base font-semibold text-slate-900">{title}</h3>
-        <p className="text-sm text-slate-500">{message}</p>
-        {actionSlot ? <div className="pt-2">{actionSlot}</div> : null}
-      </CardContent>
-    </Card>
+      <h3 className="text-sm font-medium text-slate-900">{title}</h3>
+      <p className="mt-1 text-sm text-slate-500">{message}</p>
+      {actionSlot ? <div className="mt-4">{actionSlot}</div> : null}
+    </div>
   );
 }

@@ -6,6 +6,8 @@ import { ToastProvider } from '@/components/ToastProvider';
 import { InboxIcon, ListChecksIcon, StickyNoteIcon } from '@/components/icons';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { SignOutButton } from '@/components/SignOutButton';
+import { auth } from '@/auth';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -14,7 +16,11 @@ export const metadata: Metadata = {
   description: 'Fast, keyboard-friendly notes capture for the Auto-Prioritizer MVP.',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+  const user = session?.user;
+  const isAuthenticated = Boolean(user);
+
   return (
     <html lang="en" className="bg-slate-100">
       <body className={`${inter.className} bg-slate-100 text-slate-900`}>
@@ -26,45 +32,56 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <ToastProvider />
         <div className="min-h-screen">
-          <header className="border-b border-slate-200 bg-white">
-            <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-              <Link href="/" className="text-lg font-semibold tracking-tight text-slate-900">
-                Task Loom
-              </Link>
-              <nav className="flex items-center gap-4 text-sm font-medium">
-                <Link
-                  href="/"
-                  className={cn(
-                    buttonVariants({ variant: 'ghost', size: 'sm' }),
-                    'text-slate-600 hover:text-indigo-600',
-                  )}
-                >
-                  <InboxIcon className="mr-2 h-4 w-4" aria-hidden />
-                  Inbox
-                </Link>
-                <Link
-                  href="/notes"
-                  className={cn(
-                    buttonVariants({ variant: 'ghost', size: 'sm' }),
-                    'text-slate-600 hover:text-indigo-600',
-                  )}
-                >
-                  <StickyNoteIcon className="mr-2 h-4 w-4" aria-hidden />
-                  Notes
-                </Link>
-                <Link
-                  href="/tasks"
-                  className={cn(
-                    buttonVariants({ variant: 'ghost', size: 'sm' }),
-                    'text-slate-600 hover:text-indigo-600',
-                  )}
-                >
-                  <ListChecksIcon className="mr-2 h-4 w-4" aria-hidden />
-                  Tasks
-                </Link>
-              </nav>
-            </div>
-          </header>
+          {isAuthenticated ? (
+            <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/80 backdrop-blur-sm">
+              <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
+                <div className="flex items-center gap-8">
+                  <Link href="/" className="text-lg font-semibold tracking-tight text-slate-900">
+                    Task Loom
+                  </Link>
+                  <nav className="flex items-center gap-1">
+                    <Link
+                      href="/"
+                      className={cn(
+                        buttonVariants({ variant: 'ghost', size: 'sm' }),
+                        'text-slate-600 hover:text-slate-900',
+                      )}
+                    >
+                      <InboxIcon className="mr-1.5 h-4 w-4" aria-hidden />
+                      Inbox
+                    </Link>
+                    <Link
+                      href="/notes"
+                      className={cn(
+                        buttonVariants({ variant: 'ghost', size: 'sm' }),
+                        'text-slate-600 hover:text-slate-900',
+                      )}
+                    >
+                      <StickyNoteIcon className="mr-1.5 h-4 w-4" aria-hidden />
+                      Notes
+                    </Link>
+                    <Link
+                      href="/tasks"
+                      className={cn(
+                        buttonVariants({ variant: 'ghost', size: 'sm' }),
+                        'text-slate-600 hover:text-slate-900',
+                      )}
+                    >
+                      <ListChecksIcon className="mr-1.5 h-4 w-4" aria-hidden />
+                      Tasks
+                    </Link>
+                  </nav>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-right text-sm leading-tight">
+                    <p className="font-medium text-slate-700">{user?.name ?? 'Signed in'}</p>
+                    <p className="text-xs text-slate-500">{user?.email ?? ''}</p>
+                  </div>
+                  <SignOutButton />
+                </div>
+              </div>
+            </header>
+          ) : null}
           <main id="content" className="mx-auto max-w-5xl px-6 py-8">
             {children}
           </main>

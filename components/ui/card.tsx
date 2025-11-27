@@ -9,7 +9,7 @@ export function Card({ className, as: Component = 'div', ...props }: CardProps) 
   return (
     <Component
       className={cn(
-        'rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-indigo-200 hover:shadow',
+        'rounded-lg border border-slate-200/80 bg-white shadow-soft transition-shadow duration-200 hover:shadow-soft-md',
         className,
       )}
       {...props}
@@ -20,7 +20,7 @@ export function Card({ className, as: Component = 'div', ...props }: CardProps) 
 export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function CardHeader({ className, ...props }: CardHeaderProps) {
-  return <div className={cn('space-y-1.5 p-6 pb-0', className)} {...props} />;
+  return <div className={cn('space-y-1.5 p-5 pb-0', className)} {...props} />;
 }
 
 export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
@@ -43,11 +43,11 @@ export function CardDescription({ className, ...props }: CardDescriptionProps) {
 export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function CardContent({ className, ...props }: CardContentProps) {
-  return <div className={cn('p-6 pt-4', className)} {...props} />;
+  return <div className={cn('p-5 pt-4', className)} {...props} />;
 }
 
 export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function CardFooter({ className, ...props }: CardFooterProps) {
-  return <div className={cn('flex items-center gap-3 p-6 pt-0', className)} {...props} />;
+  return <div className={cn('flex items-center gap-2 p-5 pt-0', className)} {...props} />;
 }

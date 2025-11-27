@@ -5,6 +5,7 @@ import prisma from '@/lib/prisma';
 import { parseQuickAdd } from '@/utils/parseQuickAdd';
 import { createNoteSchema } from '@/lib/validation';
 import { ensureTagsExist, normalizeTags } from '@/lib/tags';
+import { auth } from '@/auth';
 
 type QuickAddState = {
   status: 'idle' | 'success' | 'error';
@@ -15,6 +16,16 @@ export async function createQuickNoteAction(
   _: QuickAddState,
   formData: FormData,
 ): Promise<QuickAddState> {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return {
+      status: 'error',
+      message: 'Please sign in to capture notes.',
+    };
+  }
+
   const rawInput = formData.get('quickAdd');
   const rawContent = formData.get('quickAddContent');
   if (typeof rawInput !== 'string' || !rawInput.trim()) {
@@ -41,10 +52,11 @@ export async function createQuickNoteAction(
 
   try {
     const normalizedTags = normalizeTags(validation.data.tags);
-    await ensureTagsExist(normalizedTags);
+    await ensureTagsExist(userId, normalizedTags);
 
     const note = await prisma.note.create({
       data: {
+        userId,
         title: validation.data.title,
         content: validation.data.content ?? '',
         pinned: false,
@@ -52,7 +64,9 @@ export async function createQuickNoteAction(
         tags:
           normalizedTags.length > 0
             ? {
-                connect: normalizedTags.map(name => ({ name })),
+                connect: normalizedTags.map(name => ({
+                  userId_name: { userId, name },
+                })),
               }
             : undefined,
       },

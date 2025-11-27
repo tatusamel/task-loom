@@ -12,7 +12,22 @@ export const updateNoteSchema = createNoteSchema.partial();
 
 export const noteQuerySchema = z.object({
   query: z.string().optional(),
-  tag: z.string().optional(),
+  tags: z
+    .preprocess(value => {
+      if (Array.isArray(value)) {
+        return value
+          .flatMap(entry => (typeof entry === 'string' ? entry.split(',') : []))
+          .map(tag => tag.trim().toLowerCase())
+          .filter(Boolean);
+      }
+      if (typeof value === 'string') {
+        return value
+          .split(',')
+          .map(tag => tag.trim().toLowerCase())
+          .filter(Boolean);
+      }
+      return [];
+    }, z.array(z.string().min(1)).max(10).default([])),
   status: z.enum(['active', 'archived', 'all']).default('active'),
 });
 

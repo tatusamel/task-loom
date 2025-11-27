@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { noteRelations, serializeNote } from '@/lib/notes';
 import { ensureTagsExist, normalizeTags } from '@/lib/tags';
 import { updateNoteSchema } from '@/lib/validation';
+import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -14,8 +15,14 @@ interface RouteParams {
 }
 
 export async function GET(_: NextRequest, { params }: RouteParams) {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const note = await prisma.note.findUnique({
-    where: { id: params.id },
+    where: { id_userId: { id: params.id, userId } },
     include: noteRelations.include,
   });
 
@@ -27,6 +34,13 @@ export async function GET(_: NextRequest, { params }: RouteParams) {
 }
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const json = await request.json().catch(() => null);
   const parsed = updateNoteSchema.safeParse(json);
 
@@ -41,11 +55,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     parsed.data.tags !== undefined ? normalizeTags(parsed.data.tags) : undefined;
 
   if (normalizedTags) {
-    await ensureTagsExist(normalizedTags);
+    await ensureTagsExist(userId, normalizedTags);
   }
 
   const note = await prisma.note.update({
-    where: { id: params.id },
+    where: { id_userId: { id: params.id, userId } },
     data: {
       ...(parsed.data.title !== undefined ? { title: parsed.data.title } : {}),
       ...(parsed.data.content !== undefined ? { content: parsed.data.content } : {}),
@@ -54,7 +68,12 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       ...(normalizedTags !== undefined
         ? {
             tags: {
-              set: normalizedTags.map(name => ({ name })),
+              set: normalizedTags.map(name => ({
+                userId_name: {
+                  userId,
+                  name,
+                },
+              })),
             },
           }
         : {}),
@@ -70,8 +89,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 }
 
 export async function DELETE(_: NextRequest, { params }: RouteParams) {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   await prisma.note.delete({
-    where: { id: params.id },
+    where: { id_userId: { id: params.id, userId } },
   });
 
   revalidatePath('/');

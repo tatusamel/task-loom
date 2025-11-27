@@ -2,6 +2,59 @@ export function cn(...classes: Array<string | undefined | null | false>): string
   return classes.filter(Boolean).join(' ');
 }
 
+const tagPalette = [
+  {
+    background: 'bg-indigo-50',
+    text: 'text-indigo-700',
+    ring: 'ring-indigo-100',
+    icon: 'text-indigo-500',
+  },
+  {
+    background: 'bg-amber-50',
+    text: 'text-amber-800',
+    ring: 'ring-amber-100',
+    icon: 'text-amber-500',
+  },
+  {
+    background: 'bg-emerald-50',
+    text: 'text-emerald-700',
+    ring: 'ring-emerald-100',
+    icon: 'text-emerald-500',
+  },
+  {
+    background: 'bg-sky-50',
+    text: 'text-sky-700',
+    ring: 'ring-sky-100',
+    icon: 'text-sky-500',
+  },
+  {
+    background: 'bg-rose-50',
+    text: 'text-rose-700',
+    ring: 'ring-rose-100',
+    icon: 'text-rose-500',
+  },
+  {
+    background: 'bg-slate-50',
+    text: 'text-slate-700',
+    ring: 'ring-slate-200',
+    icon: 'text-slate-500',
+  },
+];
+
+function tagToPaletteIndex(tag: string) {
+  let hash = 0;
+  for (let i = 0; i < tag.length; i += 1) {
+    hash = (hash + tag.charCodeAt(i) * 17) % 997;
+  }
+  return hash % tagPalette.length;
+}
+
+export function getTagTone(tag: string) {
+  const normalized = tag.trim().toLowerCase();
+  const index = tagToPaletteIndex(normalized || 'tag');
+  return tagPalette[index];
+}
+
 export function formatDateTime(dateString: string): string {
   const date = new Date(dateString);
   return new Intl.DateTimeFormat('en', {

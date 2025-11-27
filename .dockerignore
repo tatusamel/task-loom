@@ -1,0 +1,19 @@
+# Dependencies and builds
+node_modules
+.pnpm-store
+.next
+out
+dist
+build
+
+# Local data
+postgres-data
+
+# OS / IDE
+.DS_Store
+*.log
+*.swp
+.env.local
+.env.development
+.env.production
+.env.test

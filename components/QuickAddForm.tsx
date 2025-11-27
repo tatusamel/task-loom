@@ -54,7 +54,7 @@ export function QuickAddForm({ action }: QuickAddFormProps) {
   return (
     <form
       action={formAction}
-      className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+      className="space-y-3"
       data-testid="quick-add-form"
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -111,21 +111,20 @@ function SubmitButton() {
   return (
     <Button
       type="submit"
-      size="sm"
-      className="min-w-[110px]"
+      size="default"
       isLoading={pending}
       data-testid="quick-add-submit"
     >
       {pending ? (
-        <span className="inline-flex items-center gap-2">
-          <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
+        <>
+          <LoaderIcon className="mr-1.5 h-4 w-4 animate-spin" aria-hidden />
           Adding…
-        </span>
+        </>
       ) : (
-        <span className="inline-flex items-center gap-2">
-          <PlusIcon className="h-4 w-4" aria-hidden />
-          Add
-        </span>
+        <>
+          <PlusIcon className="mr-1.5 h-4 w-4" aria-hidden />
+          Add note
+        </>
       )}
     </Button>
   );

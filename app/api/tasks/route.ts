@@ -3,12 +3,19 @@ import { revalidatePath } from 'next/cache';
 import { taskQuerySchema, createTaskSchema } from '@/lib/validation';
 import { parseDateTimeInput } from '@/lib/utils';
 import { createTask, getTasks } from '@/lib/tasks';
+import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const searchParams = request.nextUrl.searchParams;
   const raw = {
     status: searchParams.get('status') ?? undefined,
@@ -22,11 +29,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const tasks = await getTasks(parsed.data);
+  const tasks = await getTasks({ userId, ...parsed.data });
   return NextResponse.json({ tasks });
 }
 
 export async function POST(request: NextRequest) {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const json = await request.json().catch(() => null);
   const parsed = createTaskSchema.safeParse(json);
 
@@ -45,7 +59,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const task = await createTask({
+  const task = await createTask(userId, {
     title: parsed.data.title,
     notes: parsed.data.notes ?? null,
     dueAt: dueAtDate,

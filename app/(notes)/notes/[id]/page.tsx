@@ -1,6 +1,7 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { NoteEditor } from '@/components/NoteEditor';
 import { getNoteById } from '@/lib/notes';
+import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -10,7 +11,13 @@ interface NoteDetailPageProps {
 }
 
 export default async function NoteDetailPage({ params }: NoteDetailPageProps) {
-  const note = await getNoteById(params.id);
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
+    redirect('/sign-in');
+  }
+
+  const note = await getNoteById(userId, params.id);
 
   if (!note) {
     notFound();

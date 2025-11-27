@@ -1,7 +1,6 @@
 import { Prisma } from '@prisma/client';
 import prisma from './prisma';
 import type { NoteDTO, NoteStatus } from '@/types/note';
-import { ensureTagsExist, normalizeTags } from './tags';
 
 const noteInclude = {
   tags: {
@@ -26,10 +25,10 @@ export function serializeNote(
   };
 }
 
-export async function getPinnedNotes(limit = 6): Promise<NoteDTO[]> {
+export async function getPinnedNotes(userId: string, limit = 6): Promise<NoteDTO[]> {
   const notes = await prisma.note.findMany({
     include: noteInclude,
-    where: { pinned: true, archived: false },
+    where: { pinned: true, archived: false, userId },
     orderBy: { updatedAt: 'desc' },
     take: limit,
   });
@@ -37,10 +36,10 @@ export async function getPinnedNotes(limit = 6): Promise<NoteDTO[]> {
   return notes.map(serializeNote);
 }
 
-export async function getRecentNotes(limit = 8): Promise<NoteDTO[]> {
+export async function getRecentNotes(userId: string, limit = 8): Promise<NoteDTO[]> {
   const notes = await prisma.note.findMany({
     include: noteInclude,
-    where: { archived: false },
+    where: { archived: false, userId },
     orderBy: { updatedAt: 'desc' },
     take: limit,
   });
@@ -49,15 +48,19 @@ export async function getRecentNotes(limit = 8): Promise<NoteDTO[]> {
 }
 
 export async function getNotes({
+  userId,
   query,
-  tag,
+  tags,
   status,
 }: {
+  userId: string;
   query?: string;
-  tag?: string;
+  tags?: string[];
   status?: NoteStatus;
 }): Promise<NoteDTO[]> {
-  const where: Prisma.NoteWhereInput = {};
+  const where: Prisma.NoteWhereInput = {
+    userId,
+  };
 
   if (status === 'active') {
     where.archived = false;
@@ -72,10 +75,17 @@ export async function getNotes({
     ];
   }
 
-  if (tag) {
-    where.tags = {
-      some: { name: tag },
-    };
+  const normalizedTags = tags?.map(tag => tag.trim()).filter(Boolean) ?? [];
+
+  if (normalizedTags.length > 0) {
+    where.AND = [
+      ...(where.AND ?? []),
+      ...normalizedTags.map(tag => ({
+        tags: {
+          some: { name: tag, userId },
+        },
+      })),
+    ];
   }
 
   const notes = await prisma.note.findMany({
@@ -90,10 +100,10 @@ export async function getNotes({
   return notes.map(serializeNote);
 }
 
-export async function getNoteById(id: string): Promise<NoteDTO | null> {
+export async function getNoteById(userId: string, id: string): Promise<NoteDTO | null> {
   const note = await prisma.note.findUnique({
     include: noteInclude,
-    where: { id },
+    where: { id_userId: { id, userId } },
   });
 
   return note ? serializeNote(note) : null;
