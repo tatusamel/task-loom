@@ -104,11 +104,11 @@ export function TaskListClient({
   }, []);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-semibold text-slate-900">Tasks</h1>
-          <p className="mt-2 text-base text-slate-600">
+          <h1 className="text-4xl font-[550] tracking-tight text-slate-900">Tasks</h1>
+          <p className="mt-1.5 text-base text-slate-600/60">
             Plan, prioritize, and actually ship
           </p>
         </div>
@@ -117,7 +117,7 @@ export function TaskListClient({
       <TaskCreateForm onCreated={fetchTasks} />
 
       <Card>
-        <CardHeader className="px-6 pt-6 pb-4">
+        <CardHeader className="px-7 pt-7 pb-5">
           <FiltersSection
             filtersDirty={filtersDirty}
             onReset={handleResetFilters}
@@ -194,7 +194,7 @@ export function TaskListClient({
         </CardContent>
       </Card>
 
-      <section className="grid gap-4 lg:grid-cols-2">
+      <section className="grid gap-6 lg:grid-cols-2">
         {tasks.length > 0 ? (
           tasks.map(task => <TaskCard key={task.id} task={task} />)
         ) : (

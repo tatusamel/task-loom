@@ -117,7 +117,9 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
               {note.title}
             </Link>
           </CardTitle>
-          <p className="text-xs text-slate-500">Updated {formatDateTime(note.updatedAt)}</p>
+          <p className="text-[11px] font-medium text-slate-500/70">
+            Updated {formatDateTime(note.updatedAt)}
+          </p>
         </div>
         <div className="flex items-start gap-2">
           {note.pinned ? (
@@ -160,7 +162,7 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className={cn('flex flex-col gap-5 pt-2', selectionInset)}>
+      <CardContent className={cn('flex flex-col gap-5 pt-3', selectionInset)}>
         {previewHtml ? (
           <div
             className="markdown-preview text-sm leading-relaxed text-slate-600"
@@ -177,14 +179,16 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
                 key={tag}
                 variant="secondary"
                 className={cn(
-                  'border-0 px-2.5 py-1 text-xs shadow-sm transition hover:-translate-y-0.5 hover:shadow',
+                  'border border-transparent px-2 py-1 text-[11px] shadow-none transition hover:-translate-y-0.5 hover:shadow-sm rounded-lg',
                   tone.background,
                   tone.text,
                   tone.ring,
                 )}
               >
-                <TagIcon className={cn('h-3.5 w-3.5', tone.icon)} aria-hidden />
-                {tag}
+                <span className="inline-flex items-center gap-1">
+                  <TagIcon className={cn('h-3 w-3 opacity-70', tone.icon)} aria-hidden />
+                  {tag}
+                </span>
               </Badge>
             );
           })}
@@ -193,11 +197,12 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
           ) : null}
         </div>
       </CardContent>
-      <CardFooter className={cn('mt-auto flex flex-wrap gap-2 pt-2', selectionInset)}>
+      <CardFooter className={cn('mt-auto flex flex-wrap gap-2 pt-3', selectionInset)}>
         <Button
           type="button"
-          variant="outline"
-          size="sm"
+          variant="ghost"
+          size="icon"
+          className="border border-transparent hover:border-slate-200"
           onClick={handlePinToggle}
           disabled={isPending}
           title={note.pinned ? 'Unpin note' : 'Pin note'}
@@ -207,14 +212,15 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
           {isPending ? (
             <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
           ) : (
-            <PinIcon className="h-3.5 w-3.5" aria-hidden />
+            <PinIcon className="h-4 w-4" aria-hidden />
           )}
-          {note.pinned ? 'Unpin' : 'Pin'}
+          <span className="sr-only">{note.pinned ? 'Unpin' : 'Pin'}</span>
         </Button>
         <Button
           type="button"
-          variant="outline"
-          size="sm"
+          variant="ghost"
+          size="icon"
+          className="border border-transparent hover:border-slate-200"
           onClick={handleArchiveToggle}
           disabled={isPending}
           title={note.archived ? 'Restore note' : 'Archive note'}
@@ -224,18 +230,18 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
           {isPending ? (
             <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
           ) : note.archived ? (
-            <RestoreIcon className="h-3.5 w-3.5" aria-hidden />
+            <RestoreIcon className="h-4 w-4" aria-hidden />
           ) : (
-            <ArchiveIcon className="h-3.5 w-3.5" aria-hidden />
+            <ArchiveIcon className="h-4 w-4" aria-hidden />
           )}
-          {note.archived ? 'Restore' : 'Archive'}
+          <span className="sr-only">{note.archived ? 'Restore' : 'Archive'}</span>
         </Button>
         <Link
           href={`/notes/${note.id}`}
-          className={cn(buttonVariants({ variant: 'default', size: 'sm' }), 'ml-auto h-9 px-3')}
+          className={cn(buttonVariants({ variant: 'default', size: 'sm' }), 'group ml-auto h-9 px-3')}
         >
           Open
-          <ArrowRightIcon className="h-4 w-4" aria-hidden />
+          <ArrowRightIcon className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1" aria-hidden />
         </Link>
       </CardFooter>
     </Card>

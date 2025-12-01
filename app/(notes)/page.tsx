@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { createQuickNoteAction } from './actions';
 import { getPinnedNotes, getRecentNotes } from '@/lib/notes';
 import { auth } from '@/auth';
+import { SparklesIcon } from '@/components/icons';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -27,11 +28,11 @@ export default async function HomePage() {
   const recentNotes = recentNotesRaw.filter(note => !pinnedIds.has(note.id));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-semibold text-slate-900">Inbox</h1>
-          <p className="mt-2 text-base text-slate-600">
+          <h1 className="text-4xl font-[550] tracking-tight text-slate-900">Inbox</h1>
+          <p className="mt-1.5 text-base text-slate-600/60">
             Capture everything before it becomes a task
           </p>
         </div>
@@ -43,11 +44,12 @@ export default async function HomePage() {
         </Link>
       </div>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="space-y-4">
+      <section className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-purple-50/40 p-7 shadow-sm">
+        <div className="space-y-5">
           <QuickAddForm action={createQuickNoteAction} />
-          <p className="text-xs text-slate-500">
-            Tip: Add tags inline, e.g. &ldquo;Plan spring offsite #ops #team&rdquo;
+          <p className="flex items-center gap-2 text-[11px] font-medium text-slate-500/75">
+            <SparklesIcon className="h-4 w-4 text-purple-500" aria-hidden />
+            <span>Tip: Add tags inline, e.g. &ldquo;Plan spring offsite #ops #team&rdquo;</span>
           </p>
         </div>
       </section>
@@ -57,7 +59,7 @@ export default async function HomePage() {
           <h2 className="text-lg font-medium text-slate-900">Pinned</h2>
           <span className="text-xs uppercase tracking-wide text-slate-500">Quick reference</span>
         </div>
-        <div className="grid gap-4 md:grid-cols-2" data-testid="pinned-section">
+        <div className="grid gap-6 md:grid-cols-2" data-testid="pinned-section">
           {pinnedNotes.length > 0 ? (
             pinnedNotes.map(note => <NoteCard key={note.id} note={note} />)
           ) : (
@@ -75,7 +77,7 @@ export default async function HomePage() {
           <h2 className="text-lg font-medium text-slate-900">Recent</h2>
           <span className="text-xs uppercase tracking-wide text-slate-500">Latest updates</span>
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           {recentNotes.length > 0 ? (
             recentNotes.map(note => <NoteCard key={note.id} note={note} compact />)
           ) : (

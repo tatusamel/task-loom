@@ -4,40 +4,40 @@ export function cn(...classes: Array<string | undefined | null | false>): string
 
 const tagPalette = [
   {
-    background: 'bg-indigo-50',
+    background: 'bg-indigo-50/60',
     text: 'text-indigo-700',
-    ring: 'ring-indigo-100',
-    icon: 'text-indigo-500',
+    ring: 'ring-indigo-100/70',
+    icon: 'text-indigo-400',
   },
   {
-    background: 'bg-amber-50',
+    background: 'bg-amber-50/60',
     text: 'text-amber-800',
-    ring: 'ring-amber-100',
-    icon: 'text-amber-500',
+    ring: 'ring-amber-100/70',
+    icon: 'text-amber-400',
   },
   {
-    background: 'bg-emerald-50',
+    background: 'bg-emerald-50/60',
     text: 'text-emerald-700',
-    ring: 'ring-emerald-100',
-    icon: 'text-emerald-500',
+    ring: 'ring-emerald-100/70',
+    icon: 'text-emerald-400',
   },
   {
-    background: 'bg-sky-50',
+    background: 'bg-sky-50/60',
     text: 'text-sky-700',
-    ring: 'ring-sky-100',
-    icon: 'text-sky-500',
+    ring: 'ring-sky-100/70',
+    icon: 'text-sky-400',
   },
   {
-    background: 'bg-rose-50',
+    background: 'bg-rose-50/60',
     text: 'text-rose-700',
-    ring: 'ring-rose-100',
-    icon: 'text-rose-500',
+    ring: 'ring-rose-100/70',
+    icon: 'text-rose-400',
   },
   {
-    background: 'bg-slate-50',
+    background: 'bg-slate-50/70',
     text: 'text-slate-700',
-    ring: 'ring-slate-200',
-    icon: 'text-slate-500',
+    ring: 'ring-slate-200/80',
+    icon: 'text-slate-400',
   },
 ];
 

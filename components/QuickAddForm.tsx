@@ -6,7 +6,7 @@ import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { LoaderIcon, PlusIcon } from '@/components/icons';
+import { LoaderIcon, PlusIcon, SparklesIcon } from '@/components/icons';
 
 type QuickAddState = {
   status: 'idle' | 'success' | 'error';
@@ -24,10 +24,12 @@ export function QuickAddForm({ action }: QuickAddFormProps) {
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const [state, formAction] = useFormState(action, initialState);
   const [expanded, setExpanded] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
     if (state.status === 'success') {
       toast.success(state.message ?? 'Note captured.');
+      setInputValue('');
       if (inputRef.current) {
         inputRef.current.value = '';
         inputRef.current.focus();
@@ -43,6 +45,7 @@ export function QuickAddForm({ action }: QuickAddFormProps) {
 
   const handleCollapse = () => {
     setExpanded(false);
+    setInputValue('');
     if (contentRef.current) {
       contentRef.current.value = '';
     }
@@ -61,17 +64,31 @@ export function QuickAddForm({ action }: QuickAddFormProps) {
         <label htmlFor="quick-add-input" className="sr-only">
           Quick add note
         </label>
-        <Input
-          ref={inputRef}
-          id="quick-add-input"
-          name="quickAdd"
-          placeholder='Capture something… e.g. "Prep agenda #focus"'
-          className="flex-1"
-          autoComplete="off"
-          data-testid="quick-add-input"
-          onFocus={() => setExpanded(true)}
-        />
-        {!expanded ? <SubmitButton /> : null}
+        <div className="relative flex-1">
+          <Input
+            ref={inputRef}
+            id="quick-add-input"
+            name="quickAdd"
+            placeholder='Capture something… e.g. "Prep agenda #focus"'
+            className={`pr-28 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-all hover:border-slate-300 hover:bg-white focus:border-purple-500 focus:ring-purple-500/25 focus:shadow-[0_10px_36px_rgba(79,70,229,0.08)]`}
+            autoComplete="off"
+            data-testid="quick-add-input"
+            value={inputValue}
+            onChange={event => {
+              const next = event.target.value;
+              setInputValue(next);
+              if (next.trim() && !expanded) {
+                setExpanded(true);
+              }
+            }}
+            onFocus={() => setExpanded(true)}
+          />
+          {inputValue.trim() ? (
+            <div className="pointer-events-none absolute inset-y-1.5 right-1.5 flex items-center">
+              <SubmitButton className="pointer-events-auto h-9 px-3 shadow-sm" size="sm" />
+            </div>
+          ) : null}
+        </div>
       </div>
       {expanded ? (
         <div className="space-y-3">
@@ -109,13 +126,20 @@ export function QuickAddForm({ action }: QuickAddFormProps) {
   );
 }
 
-function SubmitButton() {
+function SubmitButton({
+  className,
+  size = 'default',
+}: {
+  className?: string;
+  size?: 'default' | 'sm' | 'lg' | 'icon';
+}) {
   const { pending } = useFormStatus();
 
   return (
     <Button
       type="submit"
-      size="default"
+      size={size}
+      className={className}
       isLoading={pending}
       data-testid="quick-add-submit"
     >

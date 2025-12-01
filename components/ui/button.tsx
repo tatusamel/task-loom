@@ -5,10 +5,11 @@ const baseClasses =
   'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
 
 const variantClasses = {
-  default: 'bg-purple-600 text-white shadow-sm hover:bg-purple-700 active:bg-purple-800',
+  default:
+    'bg-gradient-to-r from-purple-600 via-purple-600 to-indigo-500 text-white shadow-sm hover:from-purple-600 hover:via-purple-600 hover:to-indigo-400 hover:shadow-md active:from-purple-700 active:to-indigo-500',
   secondary: 'bg-white text-slate-800 border border-slate-200 hover:bg-slate-50 active:bg-slate-100',
   outline: 'border border-slate-200 bg-transparent text-slate-700 hover:bg-slate-50 hover:border-slate-300',
-  ghost: 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+  ghost: 'border border-transparent bg-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50 hover:text-slate-900',
   destructive: 'bg-rose-600 text-white shadow-sm hover:bg-rose-700 active:bg-rose-800',
   subtle: 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900',
   link: 'text-purple-600 underline-offset-4 hover:underline hover:text-purple-700',

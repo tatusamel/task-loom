@@ -6,7 +6,7 @@ const variantClasses = {
   secondary: 'bg-slate-50 text-slate-600 ring-1 ring-inset ring-slate-500/10',
   outline: 'bg-transparent text-slate-600 ring-1 ring-inset ring-slate-200',
   destructive: 'bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-600/20',
-  warning: 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20',
+  warning: 'bg-gradient-to-r from-amber-50 via-amber-50 to-amber-100 text-amber-800 ring-1 ring-inset ring-amber-500/25',
   success: 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20',
 } as const;
 

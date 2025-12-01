@@ -203,11 +203,11 @@ export function NotesListClient({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-semibold text-slate-900">Notes</h1>
-          <p className="mt-2 text-base text-slate-600">
+          <h1 className="text-4xl font-[550] tracking-tight text-slate-900">Notes</h1>
+          <p className="mt-1.5 text-base text-slate-600/60">
             All your captured thoughts, organized and searchable
           </p>
         </div>
@@ -269,7 +269,7 @@ export function NotesListClient({
         </CardHeader>
       </Card>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-purple-50/40 p-7 shadow-sm">
         <div
           className={cn(
             'flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600',
@@ -320,7 +320,7 @@ export function NotesListClient({
           </div>
         ) : null}
 
-        <section className="mt-4 grid gap-4 md:grid-cols-2">
+        <section className="mt-5 grid gap-6 md:grid-cols-2">
           {notes.length > 0 ? (
             notes.map(note => (
               <NoteCard

@@ -168,10 +168,12 @@ export function TaskCard({ task }: TaskCardProps) {
       <CardFooter className="flex flex-wrap items-center gap-2">
         <Button
           type="button"
-          variant="outline"
-          size="sm"
+          variant="ghost"
+          size="icon"
+          className="border border-transparent hover:border-slate-200"
           onClick={() => mutateTask({ archived: !task.archived })}
           disabled={isPending}
+          title={task.archived ? 'Restore task' : 'Archive task'}
         >
           {isPending ? (
             <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
@@ -180,7 +182,7 @@ export function TaskCard({ task }: TaskCardProps) {
           ) : (
             <ArchiveIcon className="h-4 w-4" aria-hidden />
           )}
-          {task.archived ? 'Restore' : 'Archive'}
+          <span className="sr-only">{task.archived ? 'Restore' : 'Archive'}</span>
         </Button>
         <Button
           type="button"
@@ -193,10 +195,10 @@ export function TaskCard({ task }: TaskCardProps) {
         </Button>
         <Link
           href={`/tasks/${task.id}`}
-          className={cn(buttonVariants({ variant: 'default', size: 'sm' }), 'ml-auto')}
+          className={cn(buttonVariants({ variant: 'default', size: 'sm' }), 'group ml-auto')}
         >
           Open
-          <ArrowRightIcon className="h-4 w-4" aria-hidden />
+          <ArrowRightIcon className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1" aria-hidden />
         </Link>
       </CardFooter>
     </Card>
