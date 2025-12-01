@@ -87,14 +87,48 @@ export function formatRelativeDue(dateString: string | null): string | null {
   if (!dateString) return null;
   const date = new Date(dateString);
   if (Number.isNaN(date.getTime())) return null;
-  const diffMs = date.getTime() - Date.now();
+
+  const now = new Date();
+  const diffMs = date.getTime() - now.getTime();
   const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) return 'Due today';
-  if (diffDays === 1) return 'Due tomorrow';
-  if (diffDays === -1) return 'Was due yesterday';
-  if (diffDays > 1) return `Due in ${diffDays} days`;
-  return `${Math.abs(diffDays)} days overdue`;
+  // Get day of week for "this week" context
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dayName = dayNames[date.getDay()];
+
+  // Format time for "today" display
+  const timeStr = new Intl.DateTimeFormat('en', {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(date);
+
+  // Overdue
+  if (diffDays < 0) {
+    const overdueDays = Math.abs(diffDays);
+    return overdueDays === 1 ? '1 day overdue' : `${overdueDays} days overdue`;
+  }
+
+  // Today
+  if (diffDays === 0) {
+    return `Due today at ${timeStr}`;
+  }
+
+  // Tomorrow
+  if (diffDays === 1) {
+    return 'Due tomorrow';
+  }
+
+  // This week (2-6 days)
+  if (diffDays <= 6) {
+    return `Due in ${diffDays} days (${dayName})`;
+  }
+
+  // Later - use short date format
+  const dateStr = new Intl.DateTimeFormat('en', {
+    month: 'short',
+    day: 'numeric',
+  }).format(date);
+  return `Due ${dateStr}`;
 }
 
 export function formatEffort(minutes: number | null | undefined): string | null {
@@ -102,5 +136,13 @@ export function formatEffort(minutes: number | null | undefined): string | null 
   if (minutes < 60) return `${minutes} min`;
   const hours = Math.floor(minutes / 60);
   const remaining = minutes % 60;
-  return remaining === 0 ? `${hours} h` : `${hours} h ${remaining} min`;
+  return remaining === 0 ? `${hours}h` : `${hours}h ${remaining}min`;
+}
+
+export function formatTotalEffort(minutes: number): string {
+  if (minutes === 0) return '0 min';
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  const remaining = minutes % 60;
+  return remaining === 0 ? `${hours}h` : `${hours}h ${remaining}min`;
 }

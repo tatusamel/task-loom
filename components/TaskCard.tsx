@@ -12,6 +12,7 @@ import {
   CheckIcon,
   ClockIcon,
   LoaderIcon,
+  MoreVerticalIcon,
   RestoreIcon,
   TagIcon,
   TrashIcon,
@@ -19,6 +20,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import type { TaskDTO } from '@/types/task';
 import { cn, formatDateTime, formatEffort, formatRelativeDue } from '@/lib/utils';
 
@@ -53,6 +55,7 @@ export function TaskCard({ task }: TaskCardProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [opening, setOpening] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const mutateTask = (payload: Partial<Pick<TaskDTO, 'completed' | 'archived'>>) => {
     startTransition(async () => {
@@ -112,7 +115,7 @@ export function TaskCard({ task }: TaskCardProps) {
     <Card
       as="article"
       className={cn(
-        'flex flex-col transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] animate-[fade-in-soft_200ms_ease-out] overflow-hidden',
+        'group flex flex-col transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] animate-[fade-in-soft_200ms_ease-out] overflow-hidden',
         task.completed && 'opacity-60',
         urgency === 'urgent' && !task.completed && 'ring-2 ring-amber-400 ring-offset-1',
       )}
@@ -141,20 +144,21 @@ export function TaskCard({ task }: TaskCardProps) {
       {/* Primary: Title + Status Indicator */}
       <CardHeader className="pb-3">
         <div className="flex items-start gap-4">
-          {/* Checkbox button - compact */}
+          {/* Checkbox for completion - clear toggle affordance */}
           <button
             type="button"
             onClick={() => mutateTask({ completed: !task.completed })}
             disabled={isPending}
             className={cn(
-              'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
+              'mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-all duration-150',
               task.completed
                 ? 'border-green-500 bg-green-500 text-white'
-                : 'border-slate-300 hover:border-purple-500',
+                : 'border-slate-300 bg-white hover:border-purple-500 hover:bg-purple-50',
               isPending && 'opacity-50',
             )}
             aria-pressed={task.completed}
-            aria-label={task.completed ? 'Mark active' : 'Mark complete'}
+            aria-label={task.completed ? 'Mark as active' : 'Mark as complete'}
+            title={task.completed ? 'Click to mark as active' : 'Click to mark as complete'}
           >
             {isPending ? (
               <LoaderIcon className="h-3 w-3 animate-spin" aria-hidden />
@@ -164,12 +168,12 @@ export function TaskCard({ task }: TaskCardProps) {
           </button>
 
           <div className="flex-1 min-w-0">
-            {/* Title - Most prominent */}
+            {/* Title - Most prominent: 16px, 600 weight, gray-900 */}
             <CardTitle className="flex items-start gap-2">
               <Link
                 href={`/tasks/${task.id}`}
                 className={cn(
-                  'text-lg font-semibold leading-snug transition hover:text-purple-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:rounded',
+                  'text-base font-semibold leading-[1.4] text-gray-900 transition hover:text-purple-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:rounded',
                   task.completed && 'line-through text-slate-400 font-normal',
                 )}
               >
@@ -233,10 +237,12 @@ export function TaskCard({ task }: TaskCardProps) {
         </div>
       </CardHeader>
 
-      {/* Secondary: Description (if exists) */}
+      {/* Secondary: Description (if exists) - 14px, 400 weight, gray-500, 1.6 line-height */}
       {task.notes && (
         <CardContent className="pt-1 pb-3">
-          <p className="text-sm text-slate-500 line-clamp-2 leading-6 pl-9">{task.notes}</p>
+          <p className="text-sm font-normal text-gray-500 line-clamp-2 leading-[1.6] pl-9">
+            {task.notes}
+          </p>
         </CardContent>
       )}
 
@@ -259,34 +265,66 @@ export function TaskCard({ task }: TaskCardProps) {
           )}
         </div>
 
-        {/* Actions - Compact */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          <button
-            type="button"
-            onClick={() => mutateTask({ archived: !task.archived })}
-            disabled={isPending}
-            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
-            title={task.archived ? 'Restore task' : 'Archive task'}
-          >
-            {isPending ? (
-              <LoaderIcon className="h-3.5 w-3.5 animate-spin" aria-hidden />
-            ) : task.archived ? (
-              <RestoreIcon className="h-3.5 w-3.5" aria-hidden />
-            ) : (
-              <ArchiveIcon className="h-3.5 w-3.5" aria-hidden />
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={handleDelete}
-            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-            title="Delete task"
-          >
-            <TrashIcon className="h-3.5 w-3.5" aria-hidden />
-          </button>
+        {/* Actions - Hidden by default, visible on hover with dropdown menu */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* More actions dropdown - appears on hover */}
+          <Popover open={menuOpen} onOpenChange={setMenuOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className={cn(
+                  'p-2 rounded-md transition-all duration-150',
+                  menuOpen
+                    ? 'bg-slate-100 text-slate-700'
+                    : 'text-slate-400 opacity-0 group-hover:opacity-100 hover:bg-slate-100 hover:text-slate-600',
+                )}
+                title="More actions"
+              >
+                <MoreVerticalIcon className="h-[18px] w-[18px]" aria-hidden />
+                <span className="sr-only">More actions</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-40 p-1.5">
+              <div className="flex flex-col gap-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    mutateTask({ archived: !task.archived });
+                    setMenuOpen(false);
+                  }}
+                  disabled={isPending}
+                  className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-slate-700 rounded-md hover:bg-slate-100 transition-colors text-left"
+                >
+                  {task.archived ? (
+                    <>
+                      <RestoreIcon className="h-4 w-4 text-slate-500" aria-hidden />
+                      Restore
+                    </>
+                  ) : (
+                    <>
+                      <ArchiveIcon className="h-4 w-4 text-slate-500" aria-hidden />
+                      Archive
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDelete();
+                    setMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-red-600 rounded-md hover:bg-red-50 transition-colors text-left"
+                >
+                  <TrashIcon className="h-4 w-4" aria-hidden />
+                  Delete
+                </button>
+              </div>
+            </PopoverContent>
+          </Popover>
+
           <Link
             href={`/tasks/${task.id}`}
-            className="ml-1 inline-flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-purple-100 hover:text-purple-700 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-purple-100 hover:text-purple-700 transition-colors"
             onClick={event => {
               if (event.metaKey || event.ctrlKey || event.button !== 0) return;
               setOpening(true);
@@ -294,13 +332,13 @@ export function TaskCard({ task }: TaskCardProps) {
           >
             {opening ? (
               <>
-                <LoaderIcon className="h-3 w-3 animate-spin" aria-hidden />
+                <LoaderIcon className="h-3.5 w-3.5 animate-spin" aria-hidden />
                 <span>Opening</span>
               </>
             ) : (
               <>
                 <span>Open</span>
-                <ArrowRightIcon className="h-3 w-3" aria-hidden />
+                <ArrowRightIcon className="h-3.5 w-3.5" aria-hidden />
               </>
             )}
           </Link>

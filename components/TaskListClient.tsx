@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { SearchBar } from './SearchBar';
@@ -20,7 +20,8 @@ import {
 import { TagInput } from '@/components/TagInput';
 import type { TaskDTO, TaskStatusFilter } from '@/types/task';
 import { FilterField, FiltersSection } from '@/components/FiltersSection';
-import { ListChecksIcon } from '@/components/icons';
+import { ChevronDownIcon, ChevronRightIcon, ClockIcon, ListChecksIcon } from '@/components/icons';
+import { cn, formatTotalEffort } from '@/lib/utils';
 
 interface TaskListClientProps {
   initialTasks: TaskDTO[];
@@ -48,6 +49,7 @@ export function TaskListClient({
   const [tagTokens, setTagTokens] = useState<string[]>(initialTag ? [initialTag] : []);
   const [project, setProject] = useState(initialProject);
   const [loading, setLoading] = useState(false);
+  const [showCompleted, setShowCompleted] = useState(false);
 
   useEffect(() => {
     setTasks(initialTasks);
@@ -95,7 +97,43 @@ export function TaskListClient({
     return () => clearTimeout(timer);
   }, [fetchTasks]);
 
-  const filtersDirty = query.trim() !== '' || activeTag !== '' || status !== 'all' || project.trim() !== '';
+  const filtersDirty =
+    query.trim() !== '' || activeTag !== '' || status !== 'all' || project.trim() !== '';
+
+  // Separate active and completed/archived tasks
+  const { activeTasks, completedTasks, stats } = useMemo(() => {
+    const active: TaskDTO[] = [];
+    const completed: TaskDTO[] = [];
+    let totalEffort = 0;
+    let activeEffort = 0;
+    let completedEffort = 0;
+
+    for (const task of tasks) {
+      const effort = task.estimatedEffort ?? 0;
+      totalEffort += effort;
+
+      if (task.completed || task.archived) {
+        completed.push(task);
+        completedEffort += effort;
+      } else {
+        active.push(task);
+        activeEffort += effort;
+      }
+    }
+
+    return {
+      activeTasks: active,
+      completedTasks: completed,
+      stats: {
+        total: tasks.length,
+        activeCount: active.length,
+        completedCount: completed.length,
+        totalEffort,
+        activeEffort,
+        completedEffort,
+      },
+    };
+  }, [tasks]);
 
   const handleResetFilters = useCallback(() => {
     setQuery('');
@@ -109,9 +147,7 @@ export function TaskListClient({
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-4xl font-[550] tracking-tight text-slate-900">Tasks</h1>
-          <p className="mt-1.5 text-base text-slate-600/60">
-            Plan, prioritize, and actually ship
-          </p>
+          <p className="mt-1.5 text-base text-slate-600/60">Plan, prioritize, and actually ship</p>
         </div>
       </div>
 
@@ -187,26 +223,96 @@ export function TaskListClient({
           </FiltersSection>
         </CardHeader>
         <CardContent className="border-t border-slate-200 pt-6">
-          <div className="flex items-center justify-between">
-            <Badge variant="secondary" className="text-xs">
-              {loading ? 'Loading…' : `${tasks.length} task${tasks.length === 1 ? '' : 's'}`}
-            </Badge>
+          {/* Task Summary Stats */}
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-xs font-medium">
+                {loading ? 'Loading…' : `${stats.total} task${stats.total === 1 ? '' : 's'}`}
+              </Badge>
+              {stats.totalEffort > 0 && (
+                <span className="inline-flex items-center gap-1.5 text-sm text-slate-500">
+                  <ClockIcon className="h-3.5 w-3.5" aria-hidden />
+                  {formatTotalEffort(stats.totalEffort)} total
+                </span>
+              )}
+            </div>
+            {stats.activeCount > 0 && (
+              <span className="text-sm text-slate-600">
+                <span className="font-medium text-slate-700">{stats.activeCount}</span> active
+                {stats.activeEffort > 0 && (
+                  <span className="text-slate-400"> • {formatTotalEffort(stats.activeEffort)}</span>
+                )}
+              </span>
+            )}
+            {stats.completedCount > 0 && (
+              <span className="text-sm text-slate-500">
+                <span className="font-medium">{stats.completedCount}</span> completed
+              </span>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      <section className="grid gap-6 lg:grid-cols-2">
-        {tasks.length > 0 ? (
-          tasks.map(task => <TaskCard key={task.id} task={task} />)
-        ) : (
-          <EmptyState
-            title="No tasks found"
-            message="Adjust your filters or create a new task to get started."
-            className="col-span-full"
-            icon={<ListChecksIcon className="h-6 w-6 text-purple-500" aria-hidden />}
-          />
-        )}
-      </section>
+      {/* Active Tasks */}
+      {activeTasks.length > 0 && (
+        <section className="space-y-4">
+          <h2 className="text-sm font-medium uppercase tracking-wide text-slate-500">
+            Active Tasks
+          </h2>
+          <div className="grid gap-5 lg:grid-cols-2">
+            {activeTasks.map(task => (
+              <TaskCard key={task.id} task={task} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Empty State */}
+      {tasks.length === 0 && (
+        <EmptyState
+          title="No tasks found"
+          message="Adjust your filters or create a new task to get started."
+          className="col-span-full"
+          icon={<ListChecksIcon className="h-6 w-6 text-purple-500" aria-hidden />}
+        />
+      )}
+
+      {/* Completed/Archived Tasks - Collapsible */}
+      {completedTasks.length > 0 && (
+        <section className="space-y-4">
+          <button
+            type="button"
+            onClick={() => setShowCompleted(!showCompleted)}
+            className="group flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-700"
+          >
+            {showCompleted ? (
+              <ChevronDownIcon
+                className="h-4 w-4 text-slate-400 transition group-hover:text-slate-500"
+                aria-hidden
+              />
+            ) : (
+              <ChevronRightIcon
+                className="h-4 w-4 text-slate-400 transition group-hover:text-slate-500"
+                aria-hidden
+              />
+            )}
+            <span className="uppercase tracking-wide">Completed ({completedTasks.length})</span>
+            {!showCompleted && stats.completedEffort > 0 && (
+              <span className="font-normal normal-case text-slate-400">
+                • {formatTotalEffort(stats.completedEffort)}
+              </span>
+            )}
+          </button>
+
+          {showCompleted && (
+            <div className="grid gap-5 lg:grid-cols-2">
+              {completedTasks.map(task => (
+                <TaskCard key={task.id} task={task} />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
     </div>
   );
 }
