@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { ArchiveIcon, RestoreIcon } from '@/components/icons';
@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { FilterField, FiltersSection } from '@/components/FiltersSection';
 import {
   Select,
   SelectContent,
@@ -27,27 +28,6 @@ interface NotesListClientProps {
   initialTags: string[];
   initialStatus: NoteStatus;
   availableTags: string[];
-}
-
-function FilterField({
-  label,
-  children,
-  className,
-  htmlFor,
-}: {
-  label: string;
-  children: ReactNode;
-  className?: string;
-  htmlFor?: string;
-}) {
-  return (
-    <div className={cn('flex w-full flex-col gap-1 sm:w-auto', className)}>
-      <label htmlFor={htmlFor} className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-        {label}
-      </label>
-      {children}
-    </div>
-  );
 }
 
 const statusFilters: Array<{ label: string; value: NoteStatus }> = [
@@ -226,80 +206,57 @@ export function NotesListClient({
     <div className="space-y-5">
       <Card>
         <CardHeader className="p-4 pb-3 sm:p-5">
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                <span>Filters</span>
-                {filtersDirty ? (
-                  <Badge variant="secondary" className="hidden sm:inline-flex">
-                    Active
-                  </Badge>
-                ) : (
-                  <span className="hidden text-xs font-normal text-slate-500 sm:inline">
-                    Search, tag, or status
-                  </span>
-                )}
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleResetFilters}
-                disabled={!filtersDirty}
-                className="h-9"
-              >
-                Clear filters
-              </Button>
-            </div>
+          <FiltersSection
+            filtersDirty={filtersDirty}
+            onReset={handleResetFilters}
+            layoutClassName="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr,1fr,0.9fr] xl:grid-cols-[1.6fr,1fr,1fr]"
+          >
+            <FilterField label="Search" className="sm:col-span-2 lg:col-span-1">
+              <SearchBar
+                value={query}
+                onChange={handleQueryChange}
+                placeholder="Search notes…"
+                testId="notes-search-input"
+              />
+            </FilterField>
 
-            <div className="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr,1fr,0.9fr] xl:grid-cols-[1.6fr,1fr,1fr]">
-              <FilterField label="Search" className="sm:col-span-2 lg:col-span-1">
-                <SearchBar
-                  value={query}
-                  onChange={handleQueryChange}
-                  placeholder="Search notes…"
-                  testId="notes-search-input"
-                />
-              </FilterField>
+            <FilterField label="Tag" className="sm:col-span-1">
+              <TagFilterPopover
+                value={tagTokens}
+                onChange={handleTagsChange}
+                placeholder="Filter by tags..."
+              />
+            </FilterField>
 
-              <FilterField label="Tag" className="sm:col-span-1">
-                <TagFilterPopover
-                  value={tagTokens}
-                  onChange={handleTagsChange}
-                  placeholder="Filter by tags..."
-                />
-              </FilterField>
-
-              <FilterField label="Status" htmlFor="notes-status-filter" className="sm:col-span-1">
-                <Select value={status} onValueChange={value => handleStatusChange(value as NoteStatus)}>
-                  <SelectTrigger
-                    id="notes-status-filter"
-                    data-testid="status-filter"
-                    aria-label="Filter notes by status"
-                    className="min-w-[180px]"
-                  >
-                    <SelectValue placeholder="Filter by status…" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusFilters.map(option => (
-                      <SelectItem key={option.value} value={option.value} className="pr-8">
-                        <span className="flex w-full items-center justify-between gap-3">
-                          <span>{option.label}</span>
-                          <Badge variant="secondary">
-                            {option.value === 'all'
-                              ? `${statusCounts.all}`
-                              : option.value === 'archived'
-                                ? `${statusCounts.archived}`
-                                : `${statusCounts.active}`}
-                          </Badge>
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FilterField>
-            </div>
-          </div>
+            <FilterField label="Status" htmlFor="notes-status-filter" className="sm:col-span-1">
+              <Select value={status} onValueChange={value => handleStatusChange(value as NoteStatus)}>
+                <SelectTrigger
+                  id="notes-status-filter"
+                  data-testid="status-filter"
+                  aria-label="Filter notes by status"
+                  className="min-w-[180px]"
+                >
+                  <SelectValue placeholder="Filter by status…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {statusFilters.map(option => (
+                    <SelectItem key={option.value} value={option.value} className="pr-8">
+                      <span className="flex w-full items-center justify-between gap-3">
+                        <span>{option.label}</span>
+                        <Badge variant="secondary">
+                          {option.value === 'all'
+                            ? `${statusCounts.all}`
+                            : option.value === 'archived'
+                              ? `${statusCounts.archived}`
+                              : `${statusCounts.active}`}
+                        </Badge>
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FilterField>
+          </FiltersSection>
         </CardHeader>
       </Card>
 

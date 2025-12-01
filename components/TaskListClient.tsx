@@ -8,7 +8,6 @@ import { EmptyState } from './EmptyState';
 import { TaskCard } from './TaskCard';
 import { TaskCreateForm } from './TaskCreateForm';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
@@ -20,28 +19,7 @@ import {
 } from '@/components/ui/select';
 import { TagInput } from '@/components/TagInput';
 import type { TaskDTO, TaskStatusFilter } from '@/types/task';
-import { cn } from '@/lib/utils';
-
-function FilterField({
-  label,
-  children,
-  className,
-  htmlFor,
-}: {
-  label: string;
-  children: React.ReactNode;
-  className?: string;
-  htmlFor?: string;
-}) {
-  return (
-    <div className={cn('flex w-full flex-col gap-1.5 sm:w-auto', className)}>
-      <label htmlFor={htmlFor} className="text-sm font-medium text-slate-700">
-        {label}
-      </label>
-      {children}
-    </div>
-  );
-}
+import { FilterField, FiltersSection } from '@/components/FiltersSection';
 
 interface TaskListClientProps {
   initialTasks: TaskDTO[];
@@ -130,9 +108,19 @@ export function TaskListClient({
       <TaskCreateForm onCreated={fetchTasks} />
 
       <Card>
-        <CardHeader className="p-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
-            <FilterField label="Search" className="flex-1 min-w-[200px]">
+        <CardHeader className="p-4 pb-3 sm:p-5">
+          <FiltersSection
+            filtersDirty={filtersDirty}
+            onReset={handleResetFilters}
+            layoutClassName="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-4"
+            hint="Search, tag, status, or project"
+            resetButtonSize="default"
+          >
+            <FilterField
+              label="Search"
+              className="sm:col-span-2 lg:col-span-2"
+              labelClassName="text-sm font-medium text-slate-700 normal-case"
+            >
               <SearchBar
                 value={query}
                 onChange={setQuery}
@@ -141,7 +129,11 @@ export function TaskListClient({
               />
             </FilterField>
 
-            <FilterField label="Tag" className="w-full lg:w-[180px]">
+            <FilterField
+              label="Tag"
+              className="sm:col-span-1"
+              labelClassName="text-sm font-medium text-slate-700 normal-case"
+            >
               <TagInput
                 value={tagTokens}
                 onChange={next => setTagTokens(next.slice(0, 1))}
@@ -149,7 +141,12 @@ export function TaskListClient({
               />
             </FilterField>
 
-            <FilterField label="Status" htmlFor="tasks-status-filter" className="w-full lg:w-[140px]">
+            <FilterField
+              label="Status"
+              htmlFor="tasks-status-filter"
+              className="sm:col-span-1"
+              labelClassName="text-sm font-medium text-slate-700 normal-case"
+            >
               <Select value={status} onValueChange={value => setStatus(value as TaskStatusFilter)}>
                 <SelectTrigger id="tasks-status-filter" aria-label="Filter tasks by status">
                   <SelectValue placeholder="Status" />
@@ -164,7 +161,12 @@ export function TaskListClient({
               </Select>
             </FilterField>
 
-            <FilterField label="Project" htmlFor="tasks-project-filter" className="w-full lg:w-[160px]">
+            <FilterField
+              label="Project"
+              htmlFor="tasks-project-filter"
+              className="sm:col-span-2 lg:col-span-1"
+              labelClassName="text-sm font-medium text-slate-700 normal-case"
+            >
               <Input
                 id="tasks-project-filter"
                 value={project}
@@ -172,18 +174,7 @@ export function TaskListClient({
                 placeholder="Project name"
               />
             </FilterField>
-
-            <Button
-              type="button"
-              variant="ghost"
-              size="default"
-              onClick={handleResetFilters}
-              disabled={!filtersDirty}
-              className="h-10 self-end"
-            >
-              Clear filters
-            </Button>
-          </div>
+          </FiltersSection>
         </CardHeader>
         <CardContent className="border-t border-slate-100 pt-4">
           <Badge variant="secondary">
