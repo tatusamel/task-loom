@@ -78,8 +78,9 @@ export async function getNotes({
   const normalizedTags = tags?.map(tag => tag.trim()).filter(Boolean) ?? [];
 
   if (normalizedTags.length > 0) {
+    const existingAnd = where.AND ? (Array.isArray(where.AND) ? where.AND : [where.AND]) : [];
     where.AND = [
-      ...(where.AND ?? []),
+      ...existingAnd,
       ...normalizedTags.map(tag => ({
         tags: {
           some: { name: tag, userId },
