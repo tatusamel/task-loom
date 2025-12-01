@@ -222,6 +222,14 @@ export const LoaderIcon = createIcon(
   'LoaderIcon',
 );
 
+export const UserIcon = createIcon(
+  <>
+    <circle cx="12" cy="7" r="4" />
+    <path d="M5.5 21a6.5 6.5 0 0 1 13 0" />
+  </>,
+  'UserIcon',
+);
+
 export const XIcon = createIcon(
   <>
     <line x1="18" x2="6" y1="6" y2="18" />

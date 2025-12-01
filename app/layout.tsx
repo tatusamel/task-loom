@@ -1,19 +1,24 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { ToastProvider } from '@/components/ToastProvider';
-import { InboxIcon, ListChecksIcon, StickyNoteIcon } from '@/components/icons';
-import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { SignOutButton } from '@/components/SignOutButton';
 import { auth } from '@/auth';
+import { NavLinks } from '@/components/NavLinks';
+import { SignOutButton } from '@/components/SignOutButton';
+import { ToastProvider } from '@/components/ToastProvider';
+import { UserIcon } from '@/components/icons';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Task Loom',
   description: 'Fast, keyboard-friendly notes capture for the Auto-Prioritizer MVP.',
+  icons: {
+    icon: '/task_loom_logo.png',
+    shortcut: '/task_loom_logo.png',
+    apple: '/task_loom_logo.png',
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -36,46 +41,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-xs">
               <div className="mx-auto flex max-w-6xl items-center justify-between px-4 lg:px-6 py-4">
                 <div className="flex items-center gap-8">
-                  <Link href="/" className="text-xl font-semibold tracking-tight text-slate-900">
+                  <Link
+                    href="/"
+                    className="flex items-center gap-2 rounded-full px-2 py-1 text-sm font-semibold tracking-tight text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                  >
+                    <Image
+                      src="/task_loom_logo.png"
+                      alt="Task Loom"
+                      width={40}
+                      height={40}
+                      priority
+                    />
                     Task Loom
                   </Link>
-                  <nav className="flex items-center gap-1">
-                    <Link
-                      href="/"
-                      className={cn(
-                        buttonVariants({ variant: 'ghost', size: 'sm' }),
-                        'text-slate-600 hover:text-slate-900',
-                      )}
-                    >
-                      <InboxIcon className="h-4 w-4" aria-hidden />
-                      Inbox
-                    </Link>
-                    <Link
-                      href="/notes"
-                      className={cn(
-                        buttonVariants({ variant: 'ghost', size: 'sm' }),
-                        'text-slate-600 hover:text-slate-900',
-                      )}
-                    >
-                      <StickyNoteIcon className="h-4 w-4" aria-hidden />
-                      Notes
-                    </Link>
-                    <Link
-                      href="/tasks"
-                      className={cn(
-                        buttonVariants({ variant: 'ghost', size: 'sm' }),
-                        'text-slate-600 hover:text-slate-900',
-                      )}
-                    >
-                      <ListChecksIcon className="h-4 w-4" aria-hidden />
-                      Tasks
-                    </Link>
-                  </nav>
+                  <NavLinks />
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="hidden sm:block text-right text-sm leading-tight">
-                    <p className="font-medium text-slate-900">{user?.name ?? 'Signed in'}</p>
-                    <p className="text-xs text-slate-500">{user?.email ?? ''}</p>
+                  <div className="hidden sm:flex items-center gap-2 text-sm leading-tight text-slate-900">
+                    <UserIcon className="h-5 w-5 text-slate-500" aria-hidden />
+                    <p className="font-medium">{user?.name ?? 'Signed in'}</p>
                   </div>
                   <SignOutButton />
                 </div>
