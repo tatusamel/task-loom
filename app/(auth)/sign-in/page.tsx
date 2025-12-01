@@ -34,8 +34,8 @@ export default function SignInPage({ searchParams }: SignInPageProps) {
       </div>
       <p className="mt-6 text-center text-sm text-slate-500">
         Need an account?{' '}
-        <Link href="mailto:support@taskloom.app" className={cn(buttonVariants({ variant: 'link', size: 'sm' }))}>
-          Contact us
+        <Link href="/sign-up" className={cn(buttonVariants({ variant: 'link', size: 'sm' }))}>
+          Sign up
         </Link>
       </p>
     </div>
