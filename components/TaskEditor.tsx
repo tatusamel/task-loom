@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
@@ -21,6 +21,15 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { TagInput } from './TagInput';
 import type { TaskDTO } from '@/types/task';
 import { formatDateTimeLocal } from '@/lib/utils';
@@ -45,6 +54,54 @@ export function TaskEditor({ task }: TaskEditorProps) {
   const [completed, setCompleted] = useState(task.completed);
   const [archived, setArchived] = useState(task.archived);
   const [saving, setSaving] = useState(false);
+  const [duePickerOpen, setDuePickerOpen] = useState(false);
+  const [dueTime, setDueTime] = useState(() => {
+    const timePart = dueAt?.split('T')[1]?.slice(0, 5);
+    return timePart || '09:00';
+  });
+  const timeOptions = useMemo(() => {
+    const options: string[] = [];
+    for (let h = 7; h <= 21; h += 1) {
+      options.push(`${String(h).padStart(2, '0')}:00`);
+      options.push(`${String(h).padStart(2, '0')}:30`);
+    }
+    return options;
+  }, []);
+
+  const parsedDue = useMemo(() => {
+    if (!dueAt) return undefined;
+    const d = new Date(dueAt);
+    return Number.isNaN(d.getTime()) ? undefined : d;
+  }, [dueAt]);
+
+  const dueDisplay = useMemo(() => {
+    if (!parsedDue) return 'Set due date';
+    return new Intl.DateTimeFormat('en', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(parsedDue);
+  }, [parsedDue]);
+
+  useEffect(() => {
+    const timePart = dueAt?.split('T')[1]?.slice(0, 5);
+    if (timePart) {
+      setDueTime(timePart);
+    }
+  }, [dueAt]);
+
+  const composeDue = useCallback((date: Date | undefined, time: string) => {
+    if (!date) return '';
+    const next = new Date(date);
+    const [hours, minutes] = time.split(':').map(Number);
+    if (!Number.isNaN(hours)) next.setHours(hours);
+    if (!Number.isNaN(minutes)) next.setMinutes(minutes);
+    next.setSeconds(0, 0);
+    const offset = next.getTimezoneOffset();
+    const local = new Date(next.getTime() - offset * 60_000);
+    return local.toISOString().slice(0, 16);
+  }, []);
 
   const persist = useCallback(
     async (payload: Record<string, unknown>, successMessage: string) => {
@@ -212,19 +269,82 @@ export function TaskEditor({ task }: TaskEditorProps) {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="task-editor-dueAt" className="flex items-center gap-2">
                 <CalendarIcon className="h-4 w-4 text-slate-500" aria-hidden />
                 Due date &amp; time
               </Label>
-              <Input
-                id="task-editor-dueAt"
-                type="datetime-local"
-                value={dueAt}
-                onChange={event => setDueAt(event.target.value)}
-                className="mt-1"
-                data-testid="task-editor-dueAt"
-              />
+              <Popover open={duePickerOpen} onOpenChange={setDuePickerOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    type="button"
+                    className="w-full justify-between border border-slate-200 bg-white text-left text-sm font-medium text-slate-800"
+                    data-testid="task-editor-dueAt-trigger"
+                  >
+                    <span>{dueDisplay}</span>
+                    <CalendarIcon className="h-4 w-4 text-slate-500" aria-hidden />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-72 p-4" align="start">
+                  <div className="space-y-3 text-sm text-slate-700">
+                    <Calendar
+                      mode="single"
+                      selected={parsedDue}
+                      onSelect={date => {
+                        const next = composeDue(date ?? undefined, dueTime);
+                        setDueAt(next);
+                      }}
+                      initialFocus
+                    />
+                    <div className="space-y-1.5">
+                      <Label htmlFor="task-editor-time">Time</Label>
+                      <Select
+                        value={dueTime}
+                        onValueChange={value => {
+                          setDueTime(value);
+                          setDueAt(composeDue(parsedDue, value));
+                        }}
+                      >
+                        <SelectTrigger id="task-editor-time" className="h-10">
+                          <SelectValue placeholder="Select time" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {timeOptions.map(option => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center justify-between pt-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="border border-transparent text-slate-600 hover:border-slate-200"
+                        onClick={() => {
+                          setDueAt('');
+                          setDuePickerOpen(false);
+                        }}
+                      >
+                        Clear
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => setDuePickerOpen(false)}
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <p className="text-xs text-slate-500">
+                Optional. Keeps the UI compact; pick date and time separately.
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>

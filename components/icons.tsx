@@ -121,6 +121,20 @@ export const ChevronUpIcon = createIcon(
   'ChevronUpIcon',
 );
 
+export const ChevronLeftIcon = createIcon(
+  <>
+    <polyline points="15 18 9 12 15 6" />
+  </>,
+  'ChevronLeftIcon',
+);
+
+export const ChevronRightIcon = createIcon(
+  <>
+    <polyline points="9 18 15 12 9 6" />
+  </>,
+  'ChevronRightIcon',
+);
+
 export const TagIcon = createIcon(
   <>
     <path d="M20 10v6a2 2 0 0 1-2 2h-6l-7-7 6-6 7 7z" />
