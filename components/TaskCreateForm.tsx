@@ -18,28 +18,31 @@ import { TagInput } from './TagInput';
 // Priority options with color coding
 const PRIORITY_OPTIONS = [
   {
-    value: 'P1',
-    label: 'P1',
+    value: 'high',
+    label: 'High',
     color: 'bg-red-500',
     hoverColor: 'hover:bg-red-100',
     textColor: 'text-red-700',
     importance: 5,
+    description: 'Urgent & important – Do it now',
   },
   {
-    value: 'P2',
-    label: 'P2',
+    value: 'medium',
+    label: 'Medium',
     color: 'bg-amber-500',
     hoverColor: 'hover:bg-amber-100',
     textColor: 'text-amber-700',
     importance: 3,
+    description: 'Important – Schedule it soon',
   },
   {
-    value: 'P3',
-    label: 'P3',
-    color: 'bg-green-500',
-    hoverColor: 'hover:bg-green-100',
-    textColor: 'text-green-700',
+    value: 'low',
+    label: 'Low',
+    color: 'bg-slate-400',
+    hoverColor: 'hover:bg-slate-100',
+    textColor: 'text-slate-600',
     importance: 1,
+    description: 'Nice to have – Do when time permits',
   },
 ] as const;
 
@@ -95,7 +98,7 @@ export function TaskCreateForm({ onCreated }: TaskCreateFormProps) {
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [dueTime, setDueTime] = useState('');
   const [estimatedEffort, setEstimatedEffort] = useState<number | null>(null);
-  const [priority, setPriority] = useState<'P1' | 'P2' | 'P3' | null>(null);
+  const [priority, setPriority] = useState<'high' | 'medium' | 'low' | null>(null);
   const [project, setProject] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -318,10 +321,9 @@ export function TaskCreateForm({ onCreated }: TaskCreateFormProps) {
             ))}
           </div>
           <p className="mt-1.5 text-xs text-slate-400">
-            {priority === 'P1' && 'Urgent & Important – Do it now'}
-            {priority === 'P2' && 'Important – Schedule it'}
-            {priority === 'P3' && 'Nice to have – Do when time permits'}
-            {!priority && 'Select priority level'}
+            {priority
+              ? PRIORITY_OPTIONS.find(p => p.value === priority)?.description
+              : 'Select priority level'}
           </p>
         </div>
 

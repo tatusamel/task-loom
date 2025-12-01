@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'react-hot-toast';
 import {
+  AlertTriangleIcon,
   ArchiveIcon,
   ArrowRightIcon,
   CalendarIcon,
@@ -37,6 +38,15 @@ function getUrgencyLevel(dueAt: string | null): 'overdue' | 'urgent' | 'soon' | 
   if (diffDays === 0) return 'urgent';
   if (diffDays <= 2) return 'soon';
   return 'normal';
+}
+
+// Get overdue days for display
+function getOverdueDays(dueAt: string | null): number {
+  if (!dueAt) return 0;
+  const date = new Date(dueAt);
+  if (Number.isNaN(date.getTime())) return 0;
+  const diffMs = Date.now() - date.getTime();
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 }
 
 export function TaskCard({ task }: TaskCardProps) {
@@ -90,26 +100,47 @@ export function TaskCard({ task }: TaskCardProps) {
   // Map importance to priority labels
   const priorityLabel = task.importance
     ? task.importance >= 4
-      ? 'P1'
+      ? 'High'
       : task.importance >= 3
-        ? 'P2'
-        : 'P3'
+        ? 'Medium'
+        : 'Low'
     : null;
+
+  const overdueDays = urgency === 'overdue' ? getOverdueDays(task.dueAt) : 0;
 
   return (
     <Card
       as="article"
       className={cn(
-        'flex flex-col transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] animate-[fade-in-soft_200ms_ease-out]',
+        'flex flex-col transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] animate-[fade-in-soft_200ms_ease-out] overflow-hidden',
         task.completed && 'opacity-60',
-        urgency === 'overdue' && !task.completed && 'border-l-4 border-l-red-500',
-        urgency === 'urgent' && !task.completed && 'border-l-4 border-l-amber-500',
+        urgency === 'urgent' && !task.completed && 'ring-2 ring-amber-400 ring-offset-1',
       )}
       data-testid="task-card"
     >
+      {/* OVERDUE BANNER - Maximum prominence */}
+      {urgency === 'overdue' && (
+        <div className="bg-red-600 px-4 py-2 flex items-center gap-2">
+          <AlertTriangleIcon className="h-4 w-4 text-white shrink-0" aria-hidden />
+          <span className="text-sm font-bold text-white uppercase tracking-wide">
+            {overdueDays === 1 ? '1 day overdue' : `${overdueDays} days overdue`}
+          </span>
+        </div>
+      )}
+
+      {/* DUE TODAY BANNER - High prominence */}
+      {urgency === 'urgent' && (
+        <div className="bg-amber-500 px-4 py-1.5 flex items-center gap-2">
+          <ClockIcon className="h-3.5 w-3.5 text-white shrink-0" aria-hidden />
+          <span className="text-xs font-semibold text-white uppercase tracking-wide">
+            Due today
+          </span>
+        </div>
+      )}
+
       {/* Primary: Title + Status Indicator */}
-      <CardHeader className="pb-2">
-        <div className="flex items-start gap-3">
+      <CardHeader className="pb-3">
+        <div className="flex items-start gap-4">
           {/* Checkbox button - compact */}
           <button
             type="button"
@@ -146,23 +177,12 @@ export function TaskCard({ task }: TaskCardProps) {
               </Link>
             </CardTitle>
 
-            {/* Status Row - High visibility for urgent items */}
-            <div className="mt-1.5 flex flex-wrap items-center gap-2">
-              {/* Urgency Badge - Most attention-grabbing when needed */}
-              {urgency === 'overdue' && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">
-                  <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-                  {dueDescription}
-                </span>
-              )}
-              {urgency === 'urgent' && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-                  Due today
-                </span>
-              )}
+            {/* Status Row - Secondary info */}
+            <div className="mt-2.5 flex flex-wrap items-center gap-2.5">
+              {/* Due soon badge (not overdue/urgent - those have banners) */}
               {urgency === 'soon' && dueDescription && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
+                  <CalendarIcon className="h-3 w-3" aria-hidden />
                   {dueDescription}
                 </span>
               )}
@@ -171,12 +191,20 @@ export function TaskCard({ task }: TaskCardProps) {
               {priorityLabel && !task.completed && (
                 <span
                   className={cn(
-                    'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold',
-                    priorityLabel === 'P1' && 'bg-red-500 text-white',
-                    priorityLabel === 'P2' && 'bg-amber-500 text-white',
-                    priorityLabel === 'P3' && 'bg-green-500 text-white',
+                    'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium',
+                    priorityLabel === 'High' && 'bg-red-100 text-red-700',
+                    priorityLabel === 'Medium' && 'bg-amber-100 text-amber-700',
+                    priorityLabel === 'Low' && 'bg-slate-100 text-slate-600',
                   )}
                 >
+                  <span
+                    className={cn(
+                      'h-1.5 w-1.5 rounded-full',
+                      priorityLabel === 'High' && 'bg-red-500',
+                      priorityLabel === 'Medium' && 'bg-amber-500',
+                      priorityLabel === 'Low' && 'bg-slate-400',
+                    )}
+                  />
                   {priorityLabel}
                 </span>
               )}
@@ -207,20 +235,20 @@ export function TaskCard({ task }: TaskCardProps) {
 
       {/* Secondary: Description (if exists) */}
       {task.notes && (
-        <CardContent className="py-0 pb-2">
-          <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed pl-8">{task.notes}</p>
+        <CardContent className="pt-1 pb-3">
+          <p className="text-sm text-slate-500 line-clamp-2 leading-6 pl-9">{task.notes}</p>
         </CardContent>
       )}
 
       {/* Tertiary: Tags + Actions - Least prominent */}
-      <CardFooter className="pt-2 flex items-center justify-between gap-3">
+      <CardFooter className="pt-3 flex items-center justify-between gap-4">
         {/* Tags - Subtle, small */}
-        <div className="flex flex-wrap items-center gap-1.5 pl-8 min-h-[24px]">
+        <div className="flex flex-wrap items-center gap-2 pl-9 min-h-[28px]">
           {task.tags.length > 0
             ? task.tags.slice(0, 3).map(tag => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-500"
+                  className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-500"
                 >
                   {tag}
                 </span>
@@ -232,7 +260,7 @@ export function TaskCard({ task }: TaskCardProps) {
         </div>
 
         {/* Actions - Compact */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             type="button"
             onClick={() => mutateTask({ archived: !task.archived })}

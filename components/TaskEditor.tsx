@@ -237,14 +237,10 @@ export function TaskEditor({ task }: TaskEditorProps) {
         </div>
       </div>
 
-      <Card
-        as="form"
-        onSubmit={handleSubmit}
-        className="space-y-6"
-      >
-        <CardHeader className="flex flex-col gap-2">
+      <Card as="form" onSubmit={handleSubmit} className="space-y-6">
+        <CardHeader className="flex flex-col gap-3">
           <CardTitle>Task details</CardTitle>
-          <div className="flex flex-wrap items-center gap-2 text-xs">
+          <div className="flex flex-wrap items-center gap-2.5 text-xs">
             <Badge variant={completed ? 'success' : 'secondary'}>
               {completed ? 'Completed' : 'Active'}
             </Badge>
@@ -255,21 +251,21 @@ export function TaskEditor({ task }: TaskEditorProps) {
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-7">
           <div>
             <Label htmlFor="task-editor-title">Title</Label>
             <Input
               id="task-editor-title"
               value={title}
               onChange={event => setTitle(event.target.value)}
-              className="mt-1 text-base font-semibold"
+              className="mt-2 text-base font-semibold"
               required
               data-testid="task-editor-title"
             />
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="space-y-2.5">
               <Label htmlFor="task-editor-dueAt" className="flex items-center gap-2">
                 <CalendarIcon className="h-4 w-4 text-slate-500" aria-hidden />
                 Due date &amp; time
@@ -331,11 +327,7 @@ export function TaskEditor({ task }: TaskEditorProps) {
                       >
                         Clear
                       </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        onClick={() => setDuePickerOpen(false)}
-                      >
+                      <Button type="button" size="sm" onClick={() => setDuePickerOpen(false)}>
                         Save
                       </Button>
                     </div>
@@ -387,7 +379,7 @@ export function TaskEditor({ task }: TaskEditorProps) {
               id="task-editor-project"
               value={project}
               onChange={event => setProject(event.target.value)}
-              className="mt-1"
+              className="mt-2"
               data-testid="task-editor-project"
             />
           </div>
@@ -407,13 +399,13 @@ export function TaskEditor({ task }: TaskEditorProps) {
               value={notes}
               onChange={event => setNotes(event.target.value)}
               rows={5}
-              className="mt-1 leading-6"
+              className="mt-2 leading-7"
               data-testid="task-editor-notes"
             />
           </div>
         </CardContent>
 
-        <CardFooter className="flex items-center justify-end gap-3">
+        <CardFooter className="flex items-center justify-end gap-4">
           <Button type="submit" disabled={saving} data-testid="task-editor-save">
             {saving ? (
               <span className="inline-flex items-center gap-2">
