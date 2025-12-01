@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { ArchiveIcon, RestoreIcon } from '@/components/icons';
+import { ArchiveIcon, RestoreIcon, StickyNoteIcon } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader } from '@/components/ui/card';
@@ -252,7 +252,7 @@ export function NotesListClient({
                     <SelectItem key={option.value} value={option.value} className="pr-8">
                       <span className="flex w-full items-center justify-between gap-3">
                         <span>{option.label}</span>
-                        <Badge variant="secondary">
+                        <Badge variant="secondary" className="h-6 min-w-6 justify-center rounded-full px-2 text-[11px] font-semibold">
                           {option.value === 'all'
                             ? `${statusCounts.all}`
                             : option.value === 'archived'
@@ -337,6 +337,7 @@ export function NotesListClient({
               title="No notes match your filters"
               message="Try adjusting the filters or clear the search to see more notes."
               className="col-span-full"
+              icon={<StickyNoteIcon className="h-6 w-6 text-purple-500" aria-hidden />}
             />
           )}
         </section>

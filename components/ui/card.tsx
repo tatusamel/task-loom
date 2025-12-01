@@ -9,7 +9,7 @@ export function Card({ className, as: Component = 'div', ...props }: CardProps) 
   return (
     <Component
       className={cn(
-        'rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-white to-purple-50/40 shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.12)]',
+        'rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-white to-purple-50/40 shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]',
         className,
       )}
       {...props}

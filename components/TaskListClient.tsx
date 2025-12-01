@@ -20,6 +20,7 @@ import {
 import { TagInput } from '@/components/TagInput';
 import type { TaskDTO, TaskStatusFilter } from '@/types/task';
 import { FilterField, FiltersSection } from '@/components/FiltersSection';
+import { ListChecksIcon } from '@/components/icons';
 
 interface TaskListClientProps {
   initialTasks: TaskDTO[];
@@ -202,6 +203,7 @@ export function TaskListClient({
             title="No tasks found"
             message="Adjust your filters or create a new task to get started."
             className="col-span-full"
+            icon={<ListChecksIcon className="h-6 w-6 text-purple-500" aria-hidden />}
           />
         )}
       </section>

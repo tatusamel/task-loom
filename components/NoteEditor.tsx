@@ -143,25 +143,24 @@ export function NoteEditor({ note }: NoteEditorProps) {
   };
 
   return (
-    <div className="space-y-6" data-testid="note-editor">
-      <div className="flex items-center justify-between">
-        <div>
+    <div className="space-y-8" data-testid="note-editor">
+      <div className="relative flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-2">
           <Link
             href="/notes"
-            className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 transition hover:text-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-indigo-600 shadow-sm transition hover:border-indigo-200 hover:bg-indigo-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
           >
             <ArrowLeftIcon className="h-4 w-4" aria-hidden />
             Back to notes
+            <span className="ml-1 text-[11px] text-slate-500">(Esc)</span>
           </Link>
-          <p className="mt-2 text-xs text-slate-400">
-            Last updated {new Date(note.updatedAt).toLocaleString()}
-          </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:flex-row sm:items-center sm:gap-2">
           <Button
             type="button"
-            variant={pinned ? 'secondary' : 'outline'}
+            variant="ghost"
             size="sm"
+            className="border border-transparent text-slate-700 hover:border-slate-200 hover:bg-slate-50"
             onClick={handlePinToggle}
             aria-pressed={pinned}
             data-testid="note-editor-pin"
@@ -171,8 +170,9 @@ export function NoteEditor({ note }: NoteEditorProps) {
           </Button>
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             size="sm"
+            className="border border-transparent text-slate-700 hover:border-slate-200 hover:bg-slate-50"
             onClick={handleArchiveToggle}
             aria-pressed={archived}
             data-testid="note-editor-archive"
@@ -186,8 +186,9 @@ export function NoteEditor({ note }: NoteEditorProps) {
           </Button>
           <Button
             type="button"
-            variant="destructive"
+            variant="ghost"
             size="sm"
+            className="border border-transparent text-rose-600 hover:border-rose-100 hover:bg-rose-50 hover:text-rose-700"
             onClick={handleDelete}
             data-testid="note-editor-delete"
           >
@@ -195,10 +196,15 @@ export function NoteEditor({ note }: NoteEditorProps) {
             Delete
           </Button>
         </div>
+        <div className="text-right sm:absolute sm:right-8 sm:top-0 sm:mt-0">
+          <p className="text-[11px] text-slate-500/70">
+            Last updated {new Date(note.updatedAt).toLocaleString()}
+          </p>
+        </div>
       </div>
 
-      <form onSubmit={handleSave} className="space-y-6">
-        <div>
+      <form onSubmit={handleSave} className="space-y-7">
+        <div className="space-y-3">
           <Label htmlFor="note-title" className="block text-sm font-semibold text-slate-700">
             Title
           </Label>
@@ -207,27 +213,35 @@ export function NoteEditor({ note }: NoteEditorProps) {
             name="title"
             value={title}
             onChange={event => setTitle(event.target.value)}
-            className="mt-1 w-full text-base font-semibold"
+            className="mt-1 w-full border-transparent bg-transparent px-0 py-1 text-3xl font-semibold tracking-tight placeholder:text-slate-400/70 focus:border-slate-300 focus:bg-white focus:ring-0 hover:border-slate-200"
             placeholder="Untitled note"
             data-testid="note-editor-title"
           />
+          <div>
+            <Label htmlFor="note-tags" className="block text-sm font-semibold text-slate-700">
+              Tags
+            </Label>
+            <div className="mt-2" id="note-tags">
+              <TagInput value={tags} onChange={setTags} placeholder="Add tags and press Enter" />
+            </div>
+          </div>
         </div>
 
-        <div>
+        <div className="space-y-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
             <Label htmlFor="note-content" className="block text-sm font-semibold text-slate-700">
               Markdown
             </Label>
-            <div className="inline-flex rounded-md border border-slate-200 bg-white p-1 text-sm font-medium text-slate-600 shadow-sm">
+            <div className="inline-flex rounded-full border border-slate-200 bg-slate-100/80 p-1 text-sm font-medium text-slate-600 shadow-sm">
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  'rounded-sm px-3 py-1 text-sm font-medium',
+                  'rounded-full px-3 py-1 text-sm font-medium',
                   isPreview
-                    ? '!bg-indigo-600 !text-white hover:!bg-indigo-500 hover:!text-white'
-                    : '!text-black hover:!bg-gray-200 hover:!text-black',
+                    ? '!bg-white !text-slate-900 shadow-sm'
+                    : '!text-slate-600 hover:!bg-white',
                 )}
                 onClick={() => setIsPreview(true)}
                 aria-pressed={isPreview}
@@ -241,10 +255,10 @@ export function NoteEditor({ note }: NoteEditorProps) {
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  'rounded-sm px-3 py-1 text-sm font-medium',
+                  'rounded-full px-3 py-1 text-sm font-medium',
                   !isPreview
-                    ? '!bg-indigo-600 !text-white hover:!bg-indigo-500 hover:!text-white'
-                    : '!text-black hover:!bg-gray-200 hover:!text-black',
+                    ? '!bg-white !text-slate-900 shadow-sm'
+                    : '!text-slate-600 hover:!bg-white',
                 )}
                 onClick={() => setIsPreview(false)}
                 aria-pressed={!isPreview}
@@ -260,7 +274,7 @@ export function NoteEditor({ note }: NoteEditorProps) {
           </div>
           {isPreview ? (
             <div
-              className="markdown-preview mt-2 rounded-md border border-slate-200 bg-white p-4"
+              className="markdown-preview mt-2 min-h-[480px] rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
               dangerouslySetInnerHTML={{ __html: markdownPreview }}
             />
           ) : (
@@ -269,17 +283,12 @@ export function NoteEditor({ note }: NoteEditorProps) {
               name="content"
               value={content}
               onChange={event => setContent(event.target.value)}
-              rows={12}
-              className="mt-2 w-full text-sm leading-6"
+              rows={16}
+              className="mt-2 w-full min-h-[500px] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 shadow-sm"
               placeholder="Write in Markdown..."
               data-testid="note-editor-content"
             />
           )}
-        </div>
-
-        <div>
-          <span className="block text-sm font-semibold text-slate-700">Tags</span>
-          <TagInput value={tags} onChange={setTags} placeholder="Add tags and press Enter" />
         </div>
 
         {statusMessage ? (
@@ -288,7 +297,7 @@ export function NoteEditor({ note }: NoteEditorProps) {
           </Badge>
         ) : null}
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <Button
             type="submit"
             disabled={isSaving}
@@ -303,9 +312,14 @@ export function NoteEditor({ note }: NoteEditorProps) {
               'Save changes'
             )}
           </Button>
-          <span className="text-xs text-slate-400">
+          <span className="text-[11px] text-slate-500/70">
             Keyboard-friendly: Tab through inputs, Enter to save.
           </span>
+          {statusMessage ? (
+            <span className="text-[11px] font-medium text-emerald-600">Saved</span>
+          ) : isSaving ? (
+            <span className="text-[11px] font-medium text-slate-600">Saving…</span>
+          ) : null}
         </div>
       </form>
     </div>

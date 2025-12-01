@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { toast } from 'react-hot-toast';
 import {
   ArchiveIcon,
@@ -28,6 +28,7 @@ interface TaskCardProps {
 export function TaskCard({ task }: TaskCardProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [opening, setOpening] = useState(false);
 
   const mutateTask = (payload: Partial<Pick<TaskDTO, 'completed' | 'archived'>>) => {
     startTransition(async () => {
@@ -74,7 +75,10 @@ export function TaskCard({ task }: TaskCardProps) {
   return (
     <Card
       as="article"
-      className={cn('flex flex-col gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg', task.completed && 'opacity-75')}
+      className={cn(
+        'flex flex-col gap-2 transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] animate-[fade-in-soft_200ms_ease-out]',
+        task.completed && 'opacity-75',
+      )}
       data-testid="task-card"
     >
       <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -196,9 +200,22 @@ export function TaskCard({ task }: TaskCardProps) {
         <Link
           href={`/tasks/${task.id}`}
           className={cn(buttonVariants({ variant: 'default', size: 'sm' }), 'group ml-auto')}
+          onClick={event => {
+            if (event.metaKey || event.ctrlKey || event.button !== 0) return;
+            setOpening(true);
+          }}
         >
-          Open
-          <ArrowRightIcon className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1" aria-hidden />
+          {opening ? (
+            <>
+              <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
+              Opening…
+            </>
+          ) : (
+            <>
+              Open
+              <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 ease-in-out group-hover:translate-x-1" aria-hidden />
+            </>
+          )}
         </Link>
       </CardFooter>
     </Card>

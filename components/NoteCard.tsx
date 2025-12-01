@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { toast } from 'react-hot-toast';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -32,6 +32,7 @@ interface NoteCardProps {
 export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [opening, setOpening] = useState(false);
   const showSelection = Boolean(selection);
   const selectionInset = showSelection ? 'pl-10 sm:pl-11' : '';
 
@@ -83,10 +84,11 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
     <Card
       as="article"
       className={cn(
-        'group relative flex flex-col transition-all duration-150',
+        'group relative flex flex-col transition-all duration-200 ease-in-out animate-[fade-in-soft_200ms_ease-out]',
         selection?.selected
           ? 'ring-2 ring-purple-200 bg-purple-50/60 shadow-md'
-          : 'hover:-translate-y-0.5 hover:shadow-lg',
+          : 'hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]',
+        note.pinned && 'animate-[pop-soft_240ms_ease-in-out]',
       )}
       data-testid="note-card"
       data-note-id={note.id}
@@ -105,62 +107,28 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
           </label>
         </div>
       ) : null}
-      <CardHeader
-        className={cn('flex flex-row items-start justify-between gap-4 pb-2', selectionInset)}
-      >
+      <CardHeader className={cn('flex flex-row items-start justify-between gap-4 pb-2', selectionInset)}>
         <div className="space-y-2">
-          <CardTitle>
-            <Link
-              href={`/notes/${note.id}`}
-              className="transition hover:text-purple-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:rounded"
-            >
-              {note.title}
-            </Link>
-          </CardTitle>
+          <div className="flex flex-wrap items-center gap-2">
+            <CardTitle>
+              <Link
+                href={`/notes/${note.id}`}
+                className="transition hover:text-purple-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:rounded"
+              >
+                {note.title}
+              </Link>
+            </CardTitle>
+          </div>
           <p className="text-[11px] font-medium text-slate-500/70">
             Updated {formatDateTime(note.updatedAt)}
           </p>
         </div>
-        <div className="flex items-start gap-2">
-          {note.pinned ? (
-            <Badge variant="warning" className="inline-flex items-center gap-1">
-              <PinIcon className="h-3 w-3" aria-hidden />
-              Pinned
-            </Badge>
-          ) : null}
-          <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white/80 p-1 opacity-0 shadow-sm transition hover:opacity-100 focus-within:opacity-100 group-hover:opacity-100">
-            <button
-              type="button"
-              onClick={handlePinToggle}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-purple-700 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1"
-              title={note.pinned ? 'Unpin note' : 'Pin note'}
-              aria-label={note.pinned ? 'Unpin note' : 'Pin note'}
-            >
-              <PinIcon className="h-4 w-4" aria-hidden />
-            </button>
-            <button
-              type="button"
-              onClick={handleArchiveToggle}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-purple-700 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1"
-              title={note.archived ? 'Restore to inbox' : 'Archive note'}
-              aria-label={note.archived ? 'Restore to inbox' : 'Archive note'}
-            >
-              {note.archived ? (
-                <RestoreIcon className="h-4 w-4" aria-hidden />
-              ) : (
-                <ArchiveIcon className="h-4 w-4" aria-hidden />
-              )}
-            </button>
-            <Link
-              href={`/notes/${note.id}`}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-purple-700 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1"
-              title="Open note"
-              aria-label="Open note"
-            >
-              <MoreVerticalIcon className="h-4 w-4" aria-hidden />
-            </Link>
-          </div>
-        </div>
+        {note.pinned ? (
+          <Badge variant="warning" className="inline-flex items-center gap-1">
+            <PinIcon className="h-3 w-3" aria-hidden />
+            Pinned
+          </Badge>
+        ) : null}
       </CardHeader>
       <CardContent className={cn('flex flex-col gap-5 pt-3', selectionInset)}>
         {previewHtml ? (
@@ -198,50 +166,65 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
         </div>
       </CardContent>
       <CardFooter className={cn('mt-auto flex flex-wrap gap-2 pt-3', selectionInset)}>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="border border-transparent hover:border-slate-200"
-          onClick={handlePinToggle}
-          disabled={isPending}
-          title={note.pinned ? 'Unpin note' : 'Pin note'}
-          aria-pressed={note.pinned}
-          data-testid="note-card-pin"
-        >
-          {isPending ? (
-            <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
-          ) : (
-            <PinIcon className="h-4 w-4" aria-hidden />
-          )}
-          <span className="sr-only">{note.pinned ? 'Unpin' : 'Pin'}</span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="border border-transparent hover:border-slate-200"
-          onClick={handleArchiveToggle}
-          disabled={isPending}
-          title={note.archived ? 'Restore note' : 'Archive note'}
-          aria-pressed={note.archived}
-          data-testid="note-card-archive"
-        >
-          {isPending ? (
-            <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
-          ) : note.archived ? (
-            <RestoreIcon className="h-4 w-4" aria-hidden />
-          ) : (
-            <ArchiveIcon className="h-4 w-4" aria-hidden />
-          )}
-          <span className="sr-only">{note.archived ? 'Restore' : 'Archive'}</span>
-        </Button>
+        <div className="flex items-center gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="border border-transparent hover:border-slate-200"
+            onClick={handlePinToggle}
+            disabled={isPending}
+            title={note.pinned ? 'Unpin note' : 'Pin note'}
+            aria-pressed={note.pinned}
+            data-testid="note-card-pin"
+          >
+            {isPending ? (
+              <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
+            ) : (
+              <PinIcon className="h-4 w-4" aria-hidden />
+            )}
+            <span className="sr-only">{note.pinned ? 'Unpin' : 'Pin'}</span>
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="border border-transparent hover:border-slate-200"
+            onClick={handleArchiveToggle}
+            disabled={isPending}
+            title={note.archived ? 'Restore note' : 'Archive note'}
+            aria-pressed={note.archived}
+            data-testid="note-card-archive"
+          >
+            {isPending ? (
+              <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
+            ) : note.archived ? (
+              <RestoreIcon className="h-4 w-4" aria-hidden />
+            ) : (
+              <ArchiveIcon className="h-4 w-4" aria-hidden />
+            )}
+            <span className="sr-only">{note.archived ? 'Restore' : 'Archive'}</span>
+          </Button>
+        </div>
         <Link
           href={`/notes/${note.id}`}
           className={cn(buttonVariants({ variant: 'default', size: 'sm' }), 'group ml-auto h-9 px-3')}
+          onClick={event => {
+            if (event.metaKey || event.ctrlKey || event.button !== 0) return;
+            setOpening(true);
+          }}
         >
-          Open
-          <ArrowRightIcon className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1" aria-hidden />
+          {opening ? (
+            <>
+              <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
+              Opening…
+            </>
+          ) : (
+            <>
+              Open
+              <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 ease-in-out group-hover:translate-x-1" aria-hidden />
+            </>
+          )}
         </Link>
       </CardFooter>
     </Card>

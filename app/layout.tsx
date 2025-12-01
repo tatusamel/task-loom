@@ -5,9 +5,9 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { auth } from '@/auth';
 import { NavLinks } from '@/components/NavLinks';
-import { SignOutButton } from '@/components/SignOutButton';
 import { ToastProvider } from '@/components/ToastProvider';
-import { UserIcon } from '@/components/icons';
+import { UserMenu } from '@/components/UserMenu';
+import { ShortcutOverlay } from '@/components/ShortcutOverlay';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -36,11 +36,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           Skip to content
         </a>
         <ToastProvider />
+        <ShortcutOverlay />
         <div className="min-h-screen">
           {isAuthenticated ? (
-            <header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-xs">
-              <div className="mx-auto flex max-w-6xl items-center justify-between px-4 lg:px-6 py-4">
-                <div className="flex items-center gap-8">
+            <>
+              <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:backdrop-blur">
+                <div className="mx-auto flex max-w-6xl items-center justify-between px-5 lg:px-8 py-4">
                   <Link
                     href="/"
                     className="flex items-center gap-2 rounded-full px-2 py-1 text-sm font-semibold tracking-tight text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
@@ -54,21 +55,31 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     />
                     Task Loom
                   </Link>
+                  <div className="flex items-center gap-3">
+                    <UserMenu name={user?.name} email={user?.email} />
+                  </div>
+                </div>
+                <div className="h-px w-full bg-slate-200/70" />
+                <div className="mx-auto max-w-6xl px-5 lg:px-8 py-3 md:hidden">
                   <NavLinks />
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="hidden sm:flex items-center gap-2 text-sm leading-tight text-slate-900">
-                    <UserIcon className="h-5 w-5 text-slate-500" aria-hidden />
-                    <p className="font-medium">{user?.name ?? 'Signed in'}</p>
+              </header>
+              <div className="mx-auto flex max-w-6xl gap-6 px-5 lg:px-8 py-8">
+                <aside className="sticky top-[5.5rem] hidden h-[calc(100vh-6rem)] w-56 shrink-0 md:block">
+                  <div className="rounded-2xl border border-slate-200 bg-white/80 p-3 shadow-sm">
+                    <NavLinks orientation="vertical" className="gap-1.5" />
                   </div>
-                  <SignOutButton />
-                </div>
+                </aside>
+                <main id="content" className="page-fade flex-1">
+                  {children}
+                </main>
               </div>
-            </header>
-          ) : null}
-          <main id="content" className="mx-auto max-w-6xl px-4 lg:px-6 py-8">
-            {children}
-          </main>
+            </>
+          ) : (
+            <main id="content" className="page-fade mx-auto max-w-6xl px-4 lg:px-6 py-8">
+              {children}
+            </main>
+          )}
         </div>
       </body>
     </html>
