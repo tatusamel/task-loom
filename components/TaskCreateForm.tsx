@@ -106,52 +106,56 @@ export function TaskCreateForm({ onCreated }: TaskCreateFormProps) {
 
   return (
     <Card as="form" onSubmit={handleSubmit} className="space-y-4" data-testid="task-create-form">
-      <CardHeader className="flex flex-col gap-2">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-          <SparklesIcon className="h-5 w-5 text-indigo-600" aria-hidden />
-          Create a task
-        </CardTitle>
-        <Badge variant="secondary" className="w-fit text-xs">
-          Capture details now; prioritization comes later.
-        </Badge>
+      <CardHeader className="space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50">
+            <SparklesIcon className="h-5 w-5 text-purple-600" aria-hidden />
+          </div>
+          <div className="flex-1">
+            <CardTitle className="text-lg font-semibold">Create a task</CardTitle>
+            <p className="text-xs text-slate-500 mt-0.5">Capture details now; prioritization comes later</p>
+          </div>
+        </div>
       </CardHeader>
 
       <CardContent className="space-y-6">
         <div>
-          <Label htmlFor="task-title" className="flex items-center gap-1 text-sm font-medium">
-            Title<span className="text-red-500">*</span>
+          <Label htmlFor="task-title" className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Title<span className="text-rose-500 ml-0.5">*</span>
           </Label>
-          <Input
-            id="task-title"
-            name="title"
-            value={title}
-            onChange={event => setTitle(event.target.value)}
-            className="mt-1"
-            placeholder="Draft launch plan"
-            required
-          />
+          <div className="mt-1">
+            <Input
+              id="task-title"
+              name="title"
+              value={title}
+              onChange={event => setTitle(event.target.value)}
+              placeholder="Draft launch plan"
+              required
+            />
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <Label htmlFor="task-dueAt" className="flex items-center gap-2">
-              <CalendarIcon className="h-4 w-4 text-slate-500" aria-hidden />
+            <Label htmlFor="task-dueAt" className="text-xs font-medium uppercase tracking-wide text-slate-500 flex items-center gap-2">
+              <CalendarIcon className="h-3.5 w-3.5" aria-hidden />
               Due date &amp; time
             </Label>
-            <Input
-              id="task-dueAt"
-              type="datetime-local"
-              value={dueAt}
-              onChange={event => setDueAt(event.target.value)}
-              className="mt-1"
-            />
+            <div className="mt-1">
+              <Input
+                id="task-dueAt"
+                type="datetime-local"
+                value={dueAt}
+                onChange={event => setDueAt(event.target.value)}
+              />
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="task-effort" className="flex items-center gap-2">
-                <ClockIcon className="h-4 w-4 text-slate-500" aria-hidden />
-                Estimated effort (minutes)
-              </Label>
+          <div>
+            <Label htmlFor="task-effort" className="text-xs font-medium uppercase tracking-wide text-slate-500 flex items-center gap-2">
+              <ClockIcon className="h-3.5 w-3.5" aria-hidden />
+              Effort (minutes)
+            </Label>
+            <div className="mt-1">
               <Input
                 id="task-effort"
                 type="number"
@@ -160,56 +164,72 @@ export function TaskCreateForm({ onCreated }: TaskCreateFormProps) {
                 step={5}
                 value={estimatedEffort}
                 onChange={event => setEstimatedEffort(event.target.value)}
-                className="mt-1"
                 placeholder="60"
-              />
-            </div>
-            <div>
-              <Label htmlFor="task-importance">Importance (1-5)</Label>
-              <Input
-                id="task-importance"
-                type="number"
-                min={1}
-                max={5}
-                step={1}
-                value={importance}
-                onChange={event => setImportance(event.target.value)}
-                className="mt-1"
-                placeholder="3"
               />
             </div>
           </div>
         </div>
 
         <div>
-          <Label htmlFor="task-project">Project</Label>
-          <Input
-            id="task-project"
-            value={project}
-            onChange={event => setProject(event.target.value)}
-            className="mt-1"
-            placeholder="Website refresh"
-          />
+          <Label htmlFor="task-importance" className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Importance (1-5)
+          </Label>
+          <div className="mt-2 inline-flex w-full rounded-xl border border-slate-200 bg-slate-50 p-1">
+            {[1, 2, 3, 4, 5].map(level => (
+              <button
+                key={level}
+                type="button"
+                onClick={() => setImportance(String(level))}
+                className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                  importance === String(level)
+                    ? 'bg-purple-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div>
-          <span className="flex items-center gap-2 text-sm font-medium text-slate-700">
-            <TagIcon className="h-4 w-4 text-slate-500" aria-hidden />
+          <Label htmlFor="task-project" className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Project
+          </Label>
+          <div className="mt-1">
+            <Input
+              id="task-project"
+              value={project}
+              onChange={event => setProject(event.target.value)}
+              placeholder="Website refresh"
+            />
+          </div>
+        </div>
+
+        <div>
+          <Label className="text-xs font-medium uppercase tracking-wide text-slate-500 flex items-center gap-2">
+            <TagIcon className="h-3.5 w-3.5" aria-hidden />
             Tags
-          </span>
-          <TagInput value={tags} onChange={setTags} placeholder="Add tags and press Enter" />
+          </Label>
+          <div className="mt-1">
+            <TagInput value={tags} onChange={setTags} placeholder="Add tags and press Enter" />
+          </div>
         </div>
 
         <div>
-          <Label htmlFor="task-notes">Notes</Label>
-          <Textarea
-            id="task-notes"
-            value={notes}
-            onChange={event => setNotes(event.target.value)}
-            rows={4}
-            className="mt-1 leading-6"
-            placeholder="Add any additional context…"
-          />
+          <Label htmlFor="task-notes" className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Notes
+          </Label>
+          <div className="mt-1">
+            <Textarea
+              id="task-notes"
+              value={notes}
+              onChange={event => setNotes(event.target.value)}
+              rows={4}
+              className="leading-6"
+              placeholder="Add any additional context…"
+            />
+          </div>
         </div>
       </CardContent>
 

@@ -28,33 +28,34 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-lg border border-slate-200/80 bg-white p-5 shadow-soft">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h1 className="text-xl font-semibold tracking-tight text-slate-900">Inbox</h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Capture thoughts instantly, then refine them in the editor.
-            </p>
-          </div>
-          <Link
-            href="/notes"
-            className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
-          >
-            View all notes
-          </Link>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-semibold text-slate-900">Inbox</h1>
+          <p className="mt-2 text-base text-slate-600">
+            Capture everything before it becomes a task
+          </p>
         </div>
-        <div className="mt-5">
+        <Link
+          href="/notes"
+          className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-800 shadow-sm transition-all hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+        >
+          View all notes
+        </Link>
+      </div>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="space-y-4">
           <QuickAddForm action={createQuickNoteAction} />
+          <p className="text-xs text-slate-500">
+            Tip: Add tags inline, e.g. &ldquo;Plan spring offsite #ops #team&rdquo;
+          </p>
         </div>
-        <p className="mt-3 text-xs text-slate-400">
-          Tip: Add tags inline, e.g. &ldquo;Plan spring offsite #ops #team&rdquo;.
-        </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-slate-900">Pinned</h2>
-          <span className="text-xs text-slate-400">Quick reference</span>
+          <h2 className="text-lg font-medium text-slate-900">Pinned</h2>
+          <span className="text-xs uppercase tracking-wide text-slate-500">Quick reference</span>
         </div>
         <div className="grid gap-4 md:grid-cols-2" data-testid="pinned-section">
           {pinnedNotes.length > 0 ? (
@@ -69,10 +70,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="space-y-3">
+      <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-slate-900">Recent</h2>
-          <span className="text-xs text-slate-400">Latest updates</span>
+          <h2 className="text-lg font-medium text-slate-900">Recent</h2>
+          <span className="text-xs uppercase tracking-wide text-slate-500">Latest updates</span>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           {recentNotes.length > 0 ? (

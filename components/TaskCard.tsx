@@ -74,7 +74,7 @@ export function TaskCard({ task }: TaskCardProps) {
   return (
     <Card
       as="article"
-      className={cn('flex flex-col gap-2', task.completed && 'opacity-85')}
+      className={cn('flex flex-col gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg', task.completed && 'opacity-75')}
       data-testid="task-card"
     >
       <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -89,9 +89,9 @@ export function TaskCard({ task }: TaskCardProps) {
               aria-pressed={task.completed}
             >
               {isPending ? (
-                <LoaderIcon className="mr-1.5 h-4 w-4 animate-spin" aria-hidden />
+                <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
               ) : (
-                <CheckIcon className="mr-1.5 h-4 w-4" aria-hidden />
+                <CheckIcon className="h-4 w-4" aria-hidden />
               )}
               {task.completed ? 'Mark active' : 'Mark complete'}
             </Button>
@@ -106,7 +106,7 @@ export function TaskCard({ task }: TaskCardProps) {
             <Link
               href={`/tasks/${task.id}`}
               className={cn(
-                'transition hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
+                'transition hover:text-purple-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:rounded',
                 task.completed && 'line-through text-slate-500',
               )}
             >
@@ -149,7 +149,7 @@ export function TaskCard({ task }: TaskCardProps) {
         {task.notes ? (
           <p className="text-sm leading-6 text-slate-600">{task.notes}</p>
         ) : (
-          <p className="text-sm text-slate-400">No notes yet.</p>
+          <p className="text-sm text-slate-500">No notes yet.</p>
         )}
 
         <div className="flex flex-wrap gap-2">
@@ -160,7 +160,7 @@ export function TaskCard({ task }: TaskCardProps) {
             </Badge>
           ))}
           {task.tags.length === 0 ? (
-            <span className="text-xs text-slate-400">No tags</span>
+            <span className="text-xs text-slate-500">No tags</span>
           ) : null}
         </div>
       </CardContent>
@@ -174,11 +174,11 @@ export function TaskCard({ task }: TaskCardProps) {
           disabled={isPending}
         >
           {isPending ? (
-            <LoaderIcon className="mr-1.5 h-4 w-4 animate-spin" aria-hidden />
+            <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
           ) : task.archived ? (
-            <RestoreIcon className="mr-1.5 h-4 w-4" aria-hidden />
+            <RestoreIcon className="h-4 w-4" aria-hidden />
           ) : (
-            <ArchiveIcon className="mr-1.5 h-4 w-4" aria-hidden />
+            <ArchiveIcon className="h-4 w-4" aria-hidden />
           )}
           {task.archived ? 'Restore' : 'Archive'}
         </Button>
@@ -188,7 +188,7 @@ export function TaskCard({ task }: TaskCardProps) {
           size="sm"
           onClick={handleDelete}
         >
-          <TrashIcon className="mr-1.5 h-4 w-4" aria-hidden />
+          <TrashIcon className="h-4 w-4" aria-hidden />
           Delete
         </Button>
         <Link
@@ -196,7 +196,7 @@ export function TaskCard({ task }: TaskCardProps) {
           className={cn(buttonVariants({ variant: 'default', size: 'sm' }), 'ml-auto')}
         >
           Open
-          <ArrowRightIcon className="ml-1.5 h-4 w-4" aria-hidden />
+          <ArrowRightIcon className="h-4 w-4" aria-hidden />
         </Link>
       </CardFooter>
     </Card>

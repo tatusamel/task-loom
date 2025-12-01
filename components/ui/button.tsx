@@ -2,16 +2,16 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 const baseClasses =
-  'inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
 
 const variantClasses = {
-  default: 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-500 active:bg-indigo-700',
-  secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200 active:bg-slate-300',
-  outline: 'border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:border-slate-300',
+  default: 'bg-purple-600 text-white shadow-sm hover:bg-purple-700 active:bg-purple-800',
+  secondary: 'bg-white text-slate-800 border border-slate-200 hover:bg-slate-50 active:bg-slate-100',
+  outline: 'border border-slate-200 bg-transparent text-slate-700 hover:bg-slate-50 hover:border-slate-300',
   ghost: 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-  destructive: 'bg-red-600 text-white shadow-sm hover:bg-red-500 active:bg-red-700',
+  destructive: 'bg-rose-600 text-white shadow-sm hover:bg-rose-700 active:bg-rose-800',
   subtle: 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-  link: 'text-indigo-600 underline-offset-4 hover:underline',
+  link: 'text-purple-600 underline-offset-4 hover:underline hover:text-purple-700',
 } as const;
 
 const sizeClasses = {

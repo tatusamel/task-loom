@@ -104,22 +104,31 @@ export function TaskListClient({
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-semibold text-slate-900">Tasks</h1>
+          <p className="mt-2 text-base text-slate-600">
+            Plan, prioritize, and actually ship
+          </p>
+        </div>
+      </div>
+
       <TaskCreateForm onCreated={fetchTasks} />
 
       <Card>
-        <CardHeader className="p-4 pb-3 sm:p-5">
+        <CardHeader className="px-6 pt-6 pb-4">
           <FiltersSection
             filtersDirty={filtersDirty}
             onReset={handleResetFilters}
-            layoutClassName="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-4"
-            hint="Search, tag, status, or project"
+            layoutClassName="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-4"
+            hint="Filter by search, tag, status, or project"
             resetButtonSize="default"
           >
             <FilterField
               label="Search"
               className="sm:col-span-2 lg:col-span-2"
-              labelClassName="text-sm font-medium text-slate-700 normal-case"
+              labelClassName="text-xs font-medium uppercase tracking-wide text-slate-500"
             >
               <SearchBar
                 value={query}
@@ -132,7 +141,7 @@ export function TaskListClient({
             <FilterField
               label="Tag"
               className="sm:col-span-1"
-              labelClassName="text-sm font-medium text-slate-700 normal-case"
+              labelClassName="text-xs font-medium uppercase tracking-wide text-slate-500"
             >
               <TagInput
                 value={tagTokens}
@@ -145,7 +154,7 @@ export function TaskListClient({
               label="Status"
               htmlFor="tasks-status-filter"
               className="sm:col-span-1"
-              labelClassName="text-sm font-medium text-slate-700 normal-case"
+              labelClassName="text-xs font-medium uppercase tracking-wide text-slate-500"
             >
               <Select value={status} onValueChange={value => setStatus(value as TaskStatusFilter)}>
                 <SelectTrigger id="tasks-status-filter" aria-label="Filter tasks by status">
@@ -165,7 +174,7 @@ export function TaskListClient({
               label="Project"
               htmlFor="tasks-project-filter"
               className="sm:col-span-2 lg:col-span-1"
-              labelClassName="text-sm font-medium text-slate-700 normal-case"
+              labelClassName="text-xs font-medium uppercase tracking-wide text-slate-500"
             >
               <Input
                 id="tasks-project-filter"
@@ -176,10 +185,12 @@ export function TaskListClient({
             </FilterField>
           </FiltersSection>
         </CardHeader>
-        <CardContent className="border-t border-slate-100 pt-4">
-          <Badge variant="secondary">
-            {loading ? 'Loading…' : `${tasks.length} task${tasks.length === 1 ? '' : 's'}`}
-          </Badge>
+        <CardContent className="border-t border-slate-200 pt-6">
+          <div className="flex items-center justify-between">
+            <Badge variant="secondary" className="text-xs">
+              {loading ? 'Loading…' : `${tasks.length} task${tasks.length === 1 ? '' : 's'}`}
+            </Badge>
+          </div>
         </CardContent>
       </Card>
 

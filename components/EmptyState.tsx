@@ -12,13 +12,13 @@ export function EmptyState({ title, message, actionSlot, className }: EmptyState
   return (
     <div
       className={cn(
-        'col-span-full rounded-lg border border-slate-200/80 bg-slate-50/50 px-6 py-8 text-center',
+        'col-span-full rounded-2xl border border-slate-200 bg-slate-50/50 px-6 py-12 text-center',
         className,
       )}
     >
-      <h3 className="text-sm font-medium text-slate-900">{title}</h3>
-      <p className="mt-1 text-sm text-slate-500">{message}</p>
-      {actionSlot ? <div className="mt-4">{actionSlot}</div> : null}
+      <h3 className="text-base font-medium text-slate-900">{title}</h3>
+      <p className="mt-2 text-sm text-slate-600">{message}</p>
+      {actionSlot ? <div className="mt-6">{actionSlot}</div> : null}
     </div>
   );
 }

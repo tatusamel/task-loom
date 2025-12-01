@@ -83,10 +83,10 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
     <Card
       as="article"
       className={cn(
-        'group relative flex flex-col transition-transform duration-150',
+        'group relative flex flex-col transition-all duration-150',
         selection?.selected
-          ? 'ring-2 ring-indigo-200 bg-indigo-50/60 shadow-soft-md'
-          : 'hover:-translate-y-0.5',
+          ? 'ring-2 ring-purple-200 bg-purple-50/60 shadow-md'
+          : 'hover:-translate-y-0.5 hover:shadow-lg',
       )}
       data-testid="note-card"
       data-note-id={note.id}
@@ -96,7 +96,7 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
           <input
             id={`select-${note.id}`}
             type="checkbox"
-            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+            className="h-4 w-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
             checked={selection.selected}
             onChange={event => selection.onChange(event.target.checked)}
           />
@@ -112,12 +112,12 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
           <CardTitle>
             <Link
               href={`/notes/${note.id}`}
-              className="transition hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              className="transition hover:text-purple-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:rounded"
             >
               {note.title}
             </Link>
           </CardTitle>
-          <p className="text-xs text-slate-400">Updated {formatDateTime(note.updatedAt)}</p>
+          <p className="text-xs text-slate-500">Updated {formatDateTime(note.updatedAt)}</p>
         </div>
         <div className="flex items-start gap-2">
           {note.pinned ? (
@@ -126,11 +126,11 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
               Pinned
             </Badge>
           ) : null}
-          <div className="flex items-center gap-1 rounded-md border border-slate-200 bg-white/80 p-1 opacity-0 shadow-sm transition hover:opacity-100 focus-within:opacity-100 group-hover:opacity-100">
+          <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white/80 p-1 opacity-0 shadow-sm transition hover:opacity-100 focus-within:opacity-100 group-hover:opacity-100">
             <button
               type="button"
               onClick={handlePinToggle}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-purple-700 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1"
               title={note.pinned ? 'Unpin note' : 'Pin note'}
               aria-label={note.pinned ? 'Unpin note' : 'Pin note'}
             >
@@ -139,7 +139,7 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
             <button
               type="button"
               onClick={handleArchiveToggle}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-purple-700 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1"
               title={note.archived ? 'Restore to inbox' : 'Archive note'}
               aria-label={note.archived ? 'Restore to inbox' : 'Archive note'}
             >
@@ -151,7 +151,7 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
             </button>
             <Link
               href={`/notes/${note.id}`}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-purple-700 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1"
               title="Open note"
               aria-label="Open note"
             >
@@ -167,9 +167,9 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
             dangerouslySetInnerHTML={{ __html: previewHtml }}
           />
         ) : (
-          <p className="text-sm text-slate-400">No content yet.</p>
+          <p className="text-sm text-slate-500">No content yet.</p>
         )}
-        <div className="flex flex-wrap gap-2.5">
+        <div className="flex flex-wrap gap-2">
           {note.tags.map(tag => {
             const tone = getTagTone(tag);
             return (
@@ -177,7 +177,7 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
                 key={tag}
                 variant="secondary"
                 className={cn(
-                  'border-0 px-2.5 py-1 text-[13px] shadow-sm transition hover:-translate-y-0.5 hover:shadow',
+                  'border-0 px-2.5 py-1 text-xs shadow-sm transition hover:-translate-y-0.5 hover:shadow',
                   tone.background,
                   tone.text,
                   tone.ring,
@@ -189,7 +189,7 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
             );
           })}
           {note.tags.length === 0 ? (
-            <span className="text-xs text-slate-400">No tags</span>
+            <span className="text-xs text-slate-500">No tags</span>
           ) : null}
         </div>
       </CardContent>
@@ -205,9 +205,9 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
           data-testid="note-card-pin"
         >
           {isPending ? (
-            <LoaderIcon className="mr-1.5 h-4 w-4 animate-spin" aria-hidden />
+            <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
           ) : (
-            <PinIcon className="mr-1.5 h-3.5 w-3.5" aria-hidden />
+            <PinIcon className="h-3.5 w-3.5" aria-hidden />
           )}
           {note.pinned ? 'Unpin' : 'Pin'}
         </Button>
@@ -222,11 +222,11 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
           data-testid="note-card-archive"
         >
           {isPending ? (
-            <LoaderIcon className="mr-1.5 h-4 w-4 animate-spin" aria-hidden />
+            <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
           ) : note.archived ? (
-            <RestoreIcon className="mr-1.5 h-3.5 w-3.5" aria-hidden />
+            <RestoreIcon className="h-3.5 w-3.5" aria-hidden />
           ) : (
-            <ArchiveIcon className="mr-1.5 h-3.5 w-3.5" aria-hidden />
+            <ArchiveIcon className="h-3.5 w-3.5" aria-hidden />
           )}
           {note.archived ? 'Restore' : 'Archive'}
         </Button>
@@ -235,7 +235,7 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
           className={cn(buttonVariants({ variant: 'default', size: 'sm' }), 'ml-auto h-9 px-3')}
         >
           Open
-          <ArrowRightIcon className="ml-1.5 h-4 w-4" aria-hidden />
+          <ArrowRightIcon className="h-4 w-4" aria-hidden />
         </Link>
       </CardFooter>
     </Card>

@@ -74,19 +74,23 @@ export function QuickAddForm({ action }: QuickAddFormProps) {
         {!expanded ? <SubmitButton /> : null}
       </div>
       {expanded ? (
-        <div className="space-y-2">
-          <label htmlFor="quick-add-content" className="text-sm font-medium text-slate-700">
-            Content
-          </label>
-          <Textarea
-            ref={contentRef}
-            id="quick-add-content"
-            name="quickAddContent"
-            rows={4}
-            placeholder="Add details or markdown…"
-            className="leading-6"
-            data-testid="quick-add-content"
-          />
+        <div className="space-y-3">
+          <div>
+            <label htmlFor="quick-add-content" className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              Content
+            </label>
+            <div className="mt-1">
+              <Textarea
+                ref={contentRef}
+                id="quick-add-content"
+                name="quickAddContent"
+                rows={4}
+                placeholder="Add details or markdown…"
+                className="leading-6"
+                data-testid="quick-add-content"
+              />
+            </div>
+          </div>
           <div className="flex items-center justify-end gap-2">
             <Button
               type="button"
@@ -117,12 +121,12 @@ function SubmitButton() {
     >
       {pending ? (
         <>
-          <LoaderIcon className="mr-1.5 h-4 w-4 animate-spin" aria-hidden />
+          <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />
           Adding…
         </>
       ) : (
         <>
-          <PlusIcon className="mr-1.5 h-4 w-4" aria-hidden />
+          <PlusIcon className="h-4 w-4" aria-hidden />
           Add note
         </>
       )}

@@ -13,12 +13,18 @@ interface FilterFieldProps {
   labelClassName?: string;
 }
 
-export function FilterField({ label, children, className, htmlFor, labelClassName }: FilterFieldProps) {
+export function FilterField({
+  label,
+  children,
+  className,
+  htmlFor,
+  labelClassName,
+}: FilterFieldProps) {
   return (
-    <div className={cn('flex w-full flex-col gap-1 sm:w-auto', className)}>
+    <div className={cn('flex w-full flex-col gap-3 sm:w-auto', className)}>
       <label
         htmlFor={htmlFor}
-        className={cn('text-xs font-semibold uppercase tracking-wide text-slate-500', labelClassName)}
+        className={cn('text-xs font-medium uppercase tracking-wide text-slate-500', labelClassName)}
       >
         {label}
       </label>
@@ -51,7 +57,7 @@ export function FiltersSection({
   resetButtonClassName,
 }: FiltersSectionProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-1">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
           {title ? <span>{title}</span> : null}
@@ -77,7 +83,7 @@ export function FiltersSection({
 
       <div
         className={cn(
-          'grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr,1fr,0.9fr] xl:grid-cols-[1.6fr,1fr,1fr]',
+          'grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-[1.4fr,1fr,0.9fr] xl:grid-cols-[1.6fr,1fr,1fr]',
           layoutClassName,
         )}
       >

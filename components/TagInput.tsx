@@ -46,8 +46,8 @@ export function TagInput({ value, onChange, placeholder }: TagInputProps) {
     <div
       onClick={handleContainerClick}
       className={cn(
-        'flex min-h-[44px] w-full flex-wrap items-center gap-2 rounded-lg border border-slate-200 bg-white/80 px-3 py-2 text-sm text-slate-900 transition-all duration-150 cursor-text hover:border-slate-300 hover:bg-white',
-        isFocused && 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-soft',
+        'flex min-h-[44px] w-full flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 transition-all duration-150 cursor-text hover:border-slate-300',
+        isFocused && 'border-purple-500 ring-2 ring-purple-500/20',
       )}
     >
       {value.map(tag => {
@@ -67,7 +67,7 @@ export function TagInput({ value, onChange, placeholder }: TagInputProps) {
             {tag}
             <button
               type="button"
-              className="ml-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/70 text-slate-500 transition hover:bg-white hover:text-slate-800 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1"
+              className="ml-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/70 text-slate-500 transition hover:bg-white hover:text-slate-800 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1"
               onClick={e => {
                 e.stopPropagation();
                 onChange(value.filter(existing => existing !== tag));

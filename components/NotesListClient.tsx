@@ -203,13 +203,22 @@ export function NotesListClient({
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-semibold text-slate-900">Notes</h1>
+          <p className="mt-2 text-base text-slate-600">
+            All your captured thoughts, organized and searchable
+          </p>
+        </div>
+      </div>
+
       <Card>
-        <CardHeader className="p-4 pb-3 sm:p-5">
+        <CardHeader className="px-6 pt-6 pb-4">
           <FiltersSection
             filtersDirty={filtersDirty}
             onReset={handleResetFilters}
-            layoutClassName="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr,1fr,0.9fr] xl:grid-cols-[1.6fr,1fr,1fr]"
+            layoutClassName="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-[1.4fr,1fr,0.9fr] xl:grid-cols-[1.6fr,1fr,1fr]"
           >
             <FilterField label="Search" className="sm:col-span-2 lg:col-span-1">
               <SearchBar
@@ -260,11 +269,11 @@ export function NotesListClient({
         </CardHeader>
       </Card>
 
-      <div className="rounded-xl border border-slate-200/80 bg-white/80 p-4 shadow-soft">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div
           className={cn(
-            'flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm text-slate-600',
-            hasSelection && 'border-indigo-200 bg-indigo-50/70 text-indigo-900 shadow-soft',
+            'flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600',
+            hasSelection && 'border-purple-200 bg-purple-50 text-purple-900',
           )}
         >
           <div className="flex flex-wrap items-center gap-2">
@@ -272,7 +281,7 @@ export function NotesListClient({
               {loading ? 'Loading…' : `Showing ${notes.length} note${notes.length === 1 ? '' : 's'}`}
             </Badge>
             {filtersDirty ? (
-              <span className="text-xs text-indigo-700">Filters applied</span>
+              <span className="text-xs text-purple-700">Filters applied</span>
             ) : (
               <span className="text-xs text-slate-500">All notes</span>
             )}
@@ -288,9 +297,9 @@ export function NotesListClient({
                 data-testid="bulk-archive"
               >
                 {status === 'archived' ? (
-                  <RestoreIcon className="mr-1.5 h-4 w-4" aria-hidden />
+                  <RestoreIcon className="h-4 w-4" aria-hidden />
                 ) : (
-                  <ArchiveIcon className="mr-1.5 h-4 w-4" aria-hidden />
+                  <ArchiveIcon className="h-4 w-4" aria-hidden />
                 )}
                 {status === 'archived' ? 'Restore' : 'Archive'}
               </Button>
@@ -306,7 +315,7 @@ export function NotesListClient({
         </div>
 
         {!loading && notes.length <= 1 ? (
-          <div className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+          <div className="mt-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
             Only seeing a few notes? Clear filters or add more notes to fill this space.
           </div>
         ) : null}
