@@ -261,7 +261,9 @@ export function TaskListClient({
           </h2>
           <div className="grid gap-5 lg:grid-cols-2">
             {activeTasks.map(task => (
-              <TaskCard key={task.id} task={task} />
+              <div key={task.id} className="stagger-item">
+                <TaskCard task={task} />
+              </div>
             ))}
           </div>
         </section>
@@ -305,9 +307,11 @@ export function TaskListClient({
           </button>
 
           {showCompleted && (
-            <div className="grid gap-5 lg:grid-cols-2">
+            <div className="grid gap-5 lg:grid-cols-2 animate-slide-down">
               {completedTasks.map(task => (
-                <TaskCard key={task.id} task={task} />
+                <div key={task.id} className="stagger-item">
+                  <TaskCard task={task} />
+                </div>
               ))}
             </div>
           )}

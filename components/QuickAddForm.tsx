@@ -137,7 +137,7 @@ export function QuickAddForm({ action }: QuickAddFormProps) {
         </div>
       </div>
       {expanded ? (
-        <div className="space-y-3">
+        <div className="space-y-3 animate-slide-down">
           <div>
             <label
               htmlFor="quick-add-content"

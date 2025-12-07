@@ -6,11 +6,11 @@ const baseClasses =
 
 const variantClasses = {
   default:
-    'bg-gradient-to-r from-purple-600 via-purple-600 to-indigo-500 text-white shadow-sm hover:from-purple-600 hover:via-purple-600 hover:to-indigo-400 hover:shadow-md active:from-purple-700 active:to-indigo-500',
+    'bg-gradient-to-r from-purple-600 via-purple-600 to-indigo-500 text-white shadow-sm hover:text-white hover:from-purple-600 hover:via-purple-600 hover:to-indigo-400 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] active:from-purple-700 active:to-indigo-500',
   secondary: 'bg-white text-slate-800 border border-slate-200 hover:bg-slate-50 active:bg-slate-100',
   outline: 'border border-slate-200 bg-transparent text-slate-700 hover:bg-slate-50 hover:border-slate-300',
   ghost: 'border border-transparent bg-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50 hover:text-slate-900',
-  destructive: 'bg-rose-600 text-white shadow-sm hover:bg-rose-700 active:bg-rose-800',
+  destructive: 'bg-rose-600 text-white shadow-sm hover:text-white hover:bg-rose-700 active:bg-rose-800',
   subtle: 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900',
   link: 'text-purple-600 underline-offset-4 hover:underline hover:text-purple-700',
 } as const;
