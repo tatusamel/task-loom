@@ -36,7 +36,7 @@ function hasMarkdownSyntax(text: string): boolean {
   return markdownPatterns.some(pattern => pattern.test(text));
 }
 
-const SUGGEST_EDITOR_CHAR_THRESHOLD = 150;
+const SUGGEST_EDITOR_CHAR_THRESHOLD = 50;
 
 export function QuickAddForm({ action }: QuickAddFormProps) {
   const router = useRouter();
@@ -105,11 +105,7 @@ export function QuickAddForm({ action }: QuickAddFormProps) {
   };
 
   return (
-    <form
-      action={formAction}
-      className="space-y-3"
-      data-testid="quick-add-form"
-    >
+    <form action={formAction} className="space-y-3" data-testid="quick-add-form">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <label htmlFor="quick-add-input" className="sr-only">
           Quick add note
@@ -143,7 +139,10 @@ export function QuickAddForm({ action }: QuickAddFormProps) {
       {expanded ? (
         <div className="space-y-3">
           <div>
-            <label htmlFor="quick-add-content" className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            <label
+              htmlFor="quick-add-content"
+              className="text-xs font-medium uppercase tracking-wide text-slate-500"
+            >
               Content
             </label>
             <div className="mt-1">

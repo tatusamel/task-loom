@@ -1,5 +1,6 @@
 import type { Config } from 'tailwindcss';
 import forms from '@tailwindcss/forms';
+import typography from '@tailwindcss/typography';
 
 const config: Config = {
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}', './lib/**/*.{ts,tsx}'],
@@ -42,7 +43,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [forms],
+  plugins: [forms, typography],
 };
 
 export default config;
