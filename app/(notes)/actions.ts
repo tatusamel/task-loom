@@ -10,6 +10,7 @@ import { auth } from '@/auth';
 type QuickAddState = {
   status: 'idle' | 'success' | 'error';
   message?: string;
+  noteId?: string;
 };
 
 export async function createQuickNoteAction(
@@ -77,7 +78,8 @@ export async function createQuickNoteAction(
 
     return {
       status: 'success',
-      message: `Captured “${note.title}”.`,
+      message: `Captured "${note.title}".`,
+      noteId: note.id,
     };
   } catch (error) {
     console.error(error);

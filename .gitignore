@@ -13,3 +13,5 @@ test-results
 playwright-report
 .vitest
 postgres-data
+claude.md
+agent_notes/

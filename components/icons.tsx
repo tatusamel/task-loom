@@ -260,3 +260,116 @@ export const AlertTriangleIcon = createIcon(
   </>,
   'AlertTriangleIcon',
 );
+
+export const BoldIcon = createIcon(
+  <>
+    <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
+    <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
+  </>,
+  'BoldIcon',
+);
+
+export const ItalicIcon = createIcon(
+  <>
+    <line x1="19" x2="10" y1="4" y2="4" />
+    <line x1="14" x2="5" y1="20" y2="20" />
+    <line x1="15" x2="9" y1="4" y2="20" />
+  </>,
+  'ItalicIcon',
+);
+
+export const StrikethroughIcon = createIcon(
+  <>
+    <path d="M16 4H9a3 3 0 0 0-2.83 4" />
+    <path d="M14 12a4 4 0 0 1 0 8H6" />
+    <line x1="4" x2="20" y1="12" y2="12" />
+  </>,
+  'StrikethroughIcon',
+);
+
+export const CodeIcon = createIcon(
+  <>
+    <polyline points="16 18 22 12 16 6" />
+    <polyline points="8 6 2 12 8 18" />
+  </>,
+  'CodeIcon',
+);
+
+export const Heading1Icon = createIcon(
+  <>
+    <path d="M4 12h8" />
+    <path d="M4 18V6" />
+    <path d="M12 18V6" />
+    <path d="m17 12 3-2v8" />
+  </>,
+  'Heading1Icon',
+);
+
+export const Heading2Icon = createIcon(
+  <>
+    <path d="M4 12h8" />
+    <path d="M4 18V6" />
+    <path d="M12 18V6" />
+    <path d="M21 18h-4c0-4 4-3 4-6 0-1.5-2-2.5-4-1" />
+  </>,
+  'Heading2Icon',
+);
+
+export const Heading3Icon = createIcon(
+  <>
+    <path d="M4 12h8" />
+    <path d="M4 18V6" />
+    <path d="M12 18V6" />
+    <path d="M17.5 10.5c1.7-1 3.5 0 3.5 1.5a2 2 0 0 1-2 2" />
+    <path d="M17 17.5c2 1.5 4 .3 4-1.5a2 2 0 0 0-2-2" />
+  </>,
+  'Heading3Icon',
+);
+
+export const ListIcon = createIcon(
+  <>
+    <line x1="8" x2="21" y1="6" y2="6" />
+    <line x1="8" x2="21" y1="12" y2="12" />
+    <line x1="8" x2="21" y1="18" y2="18" />
+    <line x1="3" x2="3.01" y1="6" y2="6" />
+    <line x1="3" x2="3.01" y1="12" y2="12" />
+    <line x1="3" x2="3.01" y1="18" y2="18" />
+  </>,
+  'ListIcon',
+);
+
+export const ListOrderedIcon = createIcon(
+  <>
+    <line x1="10" x2="21" y1="6" y2="6" />
+    <line x1="10" x2="21" y1="12" y2="12" />
+    <line x1="10" x2="21" y1="18" y2="18" />
+    <path d="M4 6h1v4" />
+    <path d="M4 10h2" />
+    <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" />
+  </>,
+  'ListOrderedIcon',
+);
+
+export const QuoteIcon = createIcon(
+  <>
+    <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z" />
+    <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3z" />
+  </>,
+  'QuoteIcon',
+);
+
+export const UndoIcon = createIcon(
+  <>
+    <path d="M3 7v6h6" />
+    <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+  </>,
+  'UndoIcon',
+);
+
+export const RedoIcon = createIcon(
+  <>
+    <path d="M21 7v6h-6" />
+    <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7" />
+  </>,
+  'RedoIcon',
+);

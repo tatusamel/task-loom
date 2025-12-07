@@ -1,15 +1,13 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import {
   ArchiveIcon,
   ArrowLeftIcon,
-  EyeIcon,
   LoaderIcon,
-  PenIcon,
   PinIcon,
   RestoreIcon,
   TrashIcon,
@@ -18,11 +16,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { TagInput } from './TagInput';
+import { TiptapEditor } from './TiptapEditor';
 import type { NoteDTO } from '@/types/note';
-import { renderMarkdown } from '@/lib/markdown';
-import { cn } from '@/lib/utils';
 
 interface NoteEditorProps {
   note: NoteDTO;
@@ -44,10 +40,7 @@ export function NoteEditor({ note }: NoteEditorProps) {
   const [pinned, setPinned] = useState(note.pinned);
   const [archived, setArchived] = useState(note.archived);
   const [isSaving, setIsSaving] = useState(false);
-  const [isPreview, setIsPreview] = useState(true);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-
-  const markdownPreview = useMemo(() => renderMarkdown(content || ''), [content]);
 
   const persist = useCallback(
     async (payload: NoteUpdatePayload, successMessage: string) => {
@@ -228,67 +221,15 @@ export function NoteEditor({ note }: NoteEditorProps) {
         </div>
 
         <div className="space-y-3">
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
-            <Label htmlFor="note-content" className="block text-sm font-semibold text-slate-700">
-              Markdown
-            </Label>
-            <div className="inline-flex rounded-full border border-slate-200 bg-slate-100/80 p-1 text-sm font-medium text-slate-600 shadow-sm">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  'rounded-full px-3 py-1 text-sm font-medium',
-                  isPreview
-                    ? '!bg-white !text-slate-900 shadow-sm'
-                    : '!text-slate-600 hover:!bg-white',
-                )}
-                onClick={() => setIsPreview(true)}
-                aria-pressed={isPreview}
-                data-testid="note-editor-preview-toggle-preview"
-              >
-                <EyeIcon className="mr-2 h-4 w-4" aria-hidden />
-                Preview
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  'rounded-full px-3 py-1 text-sm font-medium',
-                  !isPreview
-                    ? '!bg-white !text-slate-900 shadow-sm'
-                    : '!text-slate-600 hover:!bg-white',
-                )}
-                onClick={() => setIsPreview(false)}
-                aria-pressed={!isPreview}
-                data-testid="note-editor-preview-toggle-edit"
-              >
-                <PenIcon className="mr-2 h-4 w-4" aria-hidden />
-                Edit
-              </Button>
-            </div>
-            <p className="text-xs text-slate-400">
-              Toggle to preview rendered Markdown before saving.
-            </p>
-          </div>
-          {isPreview ? (
-            <div
-              className="markdown-preview mt-2 min-h-[480px] rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-              dangerouslySetInnerHTML={{ __html: markdownPreview }}
-            />
-          ) : (
-            <Textarea
-              id="note-content"
-              name="content"
-              value={content}
-              onChange={event => setContent(event.target.value)}
-              rows={16}
-              className="mt-2 w-full min-h-[500px] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 shadow-sm"
-              placeholder="Write in Markdown..."
-              data-testid="note-editor-content"
-            />
-          )}
+          <Label htmlFor="note-content" className="block text-sm font-semibold text-slate-700">
+            Content
+          </Label>
+          <TiptapEditor
+            content={content}
+            onChange={setContent}
+            placeholder="Start writing your note..."
+            data-testid="note-editor-content"
+          />
         </div>
 
         {statusMessage ? (
