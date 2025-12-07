@@ -7,18 +7,29 @@ import { toast } from 'react-hot-toast';
 import {
   ArchiveIcon,
   ArrowLeftIcon,
+  CalendarIcon,
+  ClockIcon,
   LoaderIcon,
   PinIcon,
   RestoreIcon,
+  SparklesIcon,
   TrashIcon,
 } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { TagInput } from './TagInput';
 import { TiptapEditor } from './TiptapEditor';
 import type { NoteDTO } from '@/types/note';
+import { formatDateTimeLocal, parseDateTimeInput } from '@/lib/utils';
 
 interface NoteEditorProps {
   note: NoteDTO;
@@ -30,6 +41,9 @@ type NoteUpdatePayload = {
   tags?: string[];
   pinned?: boolean;
   archived?: boolean;
+  dueAt?: string | null;
+  estimatedEffort?: number | null;
+  importance?: number | null;
 };
 
 export function NoteEditor({ note }: NoteEditorProps) {
@@ -39,6 +53,13 @@ export function NoteEditor({ note }: NoteEditorProps) {
   const [tags, setTags] = useState<string[]>(note.tags);
   const [pinned, setPinned] = useState(note.pinned);
   const [archived, setArchived] = useState(note.archived);
+  const [dueAtInput, setDueAtInput] = useState<string>(formatDateTimeLocal(note.dueAt));
+  const [estimatedEffortInput, setEstimatedEffortInput] = useState<string>(
+    note.estimatedEffort ? String(note.estimatedEffort) : '',
+  );
+  const [importanceInput, setImportanceInput] = useState<string>(
+    note.importance ? String(note.importance) : '',
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
@@ -68,6 +89,9 @@ export function NoteEditor({ note }: NoteEditorProps) {
         setTags(updatedNote.tags);
         setPinned(updatedNote.pinned);
         setArchived(updatedNote.archived);
+        setDueAtInput(formatDateTimeLocal(updatedNote.dueAt));
+        setEstimatedEffortInput(updatedNote.estimatedEffort ? String(updatedNote.estimatedEffort) : '');
+        setImportanceInput(updatedNote.importance ? String(updatedNote.importance) : '');
 
         toast.success(successMessage);
         setStatusMessage(successMessage);
@@ -87,6 +111,37 @@ export function NoteEditor({ note }: NoteEditorProps) {
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    let dueAtValue: string | null | undefined = undefined;
+    if (dueAtInput === '') {
+      dueAtValue = null;
+    } else if (dueAtInput) {
+      const parsedDue = parseDateTimeInput(dueAtInput);
+      if (!parsedDue) {
+        toast.error('Enter a valid due date/time.');
+        return;
+      }
+      dueAtValue = parsedDue.toISOString();
+    }
+
+    let effortValue: number | null | undefined = undefined;
+    if (estimatedEffortInput === '') {
+      effortValue = null;
+    } else if (estimatedEffortInput) {
+      const parsedEffort = Number(estimatedEffortInput);
+      if (Number.isNaN(parsedEffort) || parsedEffort <= 0) {
+        toast.error('Estimated effort must be a positive number of minutes.');
+        return;
+      }
+      effortValue = parsedEffort;
+    }
+
+    let importanceValue: number | null | undefined = undefined;
+    if (importanceInput === '') {
+      importanceValue = null;
+    } else if (importanceInput) {
+      importanceValue = Number(importanceInput);
+    }
+
     await persist(
       {
         title,
@@ -94,6 +149,9 @@ export function NoteEditor({ note }: NoteEditorProps) {
         tags,
         pinned,
         archived,
+        dueAt: dueAtValue,
+        estimatedEffort: effortValue,
+        importance: importanceValue,
       },
       'Saved changes.',
     );
@@ -216,6 +274,59 @@ export function NoteEditor({ note }: NoteEditorProps) {
             </Label>
             <div className="mt-2" id="note-tags">
               <TagInput value={tags} onChange={setTags} placeholder="Add tags and press Enter" />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="note-due" className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                <CalendarIcon className="h-4 w-4 text-slate-400" aria-hidden />
+                Due date (optional)
+              </Label>
+              <Input
+                id="note-due"
+                type="datetime-local"
+                value={dueAtInput}
+                onChange={event => setDueAtInput(event.target.value)}
+                placeholder="Add due date"
+              />
+              <p className="text-xs text-slate-500">Leave blank to remove the due date.</p>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="note-effort" className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                <ClockIcon className="h-4 w-4 text-slate-400" aria-hidden />
+                Effort (minutes)
+              </Label>
+              <Input
+                id="note-effort"
+                type="number"
+                min={5}
+                step={5}
+                value={estimatedEffortInput}
+                onChange={event => setEstimatedEffortInput(event.target.value)}
+                placeholder="e.g. 45"
+              />
+              <p className="text-xs text-slate-500">Use whatever granularity helps planning.</p>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                <SparklesIcon className="h-4 w-4 text-slate-400" aria-hidden />
+                Priority
+              </Label>
+              <Select
+                value={importanceInput === '' ? 'none' : importanceInput}
+                onValueChange={value => setImportanceInput(value === 'none' ? '' : value)}
+              >
+                <SelectTrigger id="note-priority">
+                  <SelectValue placeholder="None" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="5">High – bubble up now</SelectItem>
+                  <SelectItem value="3">Medium – schedule soon</SelectItem>
+                  <SelectItem value="1">Low – nice to have</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>

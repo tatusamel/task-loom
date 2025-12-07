@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { createNoteSchema, noteQuerySchema } from '@/lib/validation';
 import { getNotes, noteRelations, serializeNote } from '@/lib/notes';
 import { ensureTagsExist, normalizeTags } from '@/lib/tags';
+import { parseDateTimeInput } from '@/lib/utils';
 import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
@@ -60,12 +61,16 @@ export async function POST(request: NextRequest) {
 
   const tagNames = normalizeTags(parsed.data.tags ?? []);
   await ensureTagsExist(userId, tagNames);
+  const dueAtDate = parseDateTimeInput(parsed.data.dueAt ?? undefined);
 
   const note = await prisma.note.create({
     data: {
       userId,
       title: parsed.data.title,
       content: parsed.data.content ?? '',
+      dueAt: dueAtDate,
+      estimatedEffort: parsed.data.estimatedEffort ?? null,
+      importance: parsed.data.importance ?? null,
       pinned: parsed.data.pinned ?? false,
       archived: parsed.data.archived ?? false,
       tags:

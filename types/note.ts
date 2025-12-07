@@ -5,6 +5,9 @@ export interface NoteDTO {
   title: string;
   content: string;
   tags: string[];
+  dueAt: string | null;
+  estimatedEffort: number | null;
+  importance: number | null;
   pinned: boolean;
   archived: boolean;
   createdAt: string;
