@@ -25,7 +25,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { TagInput } from './TagInput';
-import { TiptapEditor } from './TiptapEditor';
+import { CollaborativeEditor } from './CollaborativeEditor';
+import { SharePopover } from './SharePopover';
 import type { NoteDTO } from '@/types/note';
 
 interface NoteEditorProps {
@@ -169,7 +170,8 @@ export function NoteEditor({ note }: NoteEditorProps) {
             <span className="ml-1 text-[11px] text-slate-500">(Esc)</span>
           </Link>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2 sm:flex-row sm:items-center sm:gap-2">
+          <SharePopover noteId={note.id} />
           <Button
             type="button"
             variant="ghost"
@@ -264,11 +266,11 @@ export function NoteEditor({ note }: NoteEditorProps) {
           <Label htmlFor="note-content" className="block text-sm font-semibold text-slate-700">
             Content
           </Label>
-          <TiptapEditor
-            content={content}
+          <CollaborativeEditor
+            noteId={note.id}
+            initialContent={content}
             onChange={setContent}
             placeholder="Start writing your note..."
-            data-testid="note-editor-content"
           />
         </div>
 
@@ -279,11 +281,7 @@ export function NoteEditor({ note }: NoteEditorProps) {
         ) : null}
 
         <div className="flex items-center gap-4">
-          <Button
-            type="submit"
-            disabled={isSaving}
-            data-testid="note-editor-save"
-          >
+          <Button type="submit" disabled={isSaving} data-testid="note-editor-save">
             {isSaving ? (
               <span className="inline-flex items-center gap-2">
                 <LoaderIcon className="h-4 w-4 animate-spin" aria-hidden />

@@ -20,8 +20,21 @@ model Note {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
   tags   Tag[]
+  shares NoteShare[]
 
   @@unique([id, userId])
+}
+
+model NoteShare {
+  id         String    @id @default(cuid())
+  noteId     String
+  note       Note      @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  token      String    @unique
+  permission String    @default("edit") // "view" | "edit"
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime?
+
+  @@index([token])
 }
 
 model Task {
