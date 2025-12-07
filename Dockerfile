@@ -1,7 +1,9 @@
 # Stage 1: Install dependencies
 FROM node:20-bookworm-slim AS deps
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
+COPY prisma ./prisma
 RUN corepack enable && pnpm install --frozen-lockfile
 
 # Stage 2: Build the application
