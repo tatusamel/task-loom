@@ -26,7 +26,7 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/task_loom_test
-      AUTH_SECRET: ci-test-secret-at-least-32-characters-long
+      AUTH_SECRET: ${{ github.sha }}${{ github.sha }}
 
     steps:
       - uses: actions/checkout@v4
