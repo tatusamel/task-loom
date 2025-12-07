@@ -269,7 +269,7 @@ export function NotesListClient({
         </CardHeader>
       </Card>
 
-      <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-purple-50/40 p-7 shadow-sm">
+      <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-7 shadow-sm dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800/60">
         <div
           className={cn(
             'flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600',

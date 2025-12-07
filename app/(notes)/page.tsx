@@ -49,7 +49,7 @@ export default async function HomePage() {
         </Link>
       </div>
 
-      <section className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-purple-50/40 p-7 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-7 shadow-sm dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800/60">
         <div className="space-y-5">
           <QuickAddForm action={createQuickNoteAction} />
           <p className="flex items-center gap-2 text-[11px] font-medium text-slate-500/75">

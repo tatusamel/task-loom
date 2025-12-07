@@ -9,8 +9,9 @@ export function Card({ className, as: Component = 'div', ...props }: CardProps) 
   return (
     <Component
       className={cn(
-        'rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-white to-purple-50/40 shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]',
-        className,
+        'rounded-2xl border border-slate-200/70 bg-gradient-to-br from-white via-white to-slate-50 shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]',
+        'dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800/60 dark:shadow-[0_1px_3px_rgba(0,0,0,0.28)] dark:hover:shadow-[0_6px_18px_rgba(0,0,0,0.3)]',
+      className,
       )}
       {...props}
     />
