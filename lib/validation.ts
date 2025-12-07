@@ -1,47 +1,23 @@
 import { z } from 'zod';
 
-export const createNoteSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(160, 'Title is too long'),
-  content: z.string().optional(),
-  tags: z.array(z.string().min(1)).max(12).default([]),
-  pinned: z.boolean().optional(),
-  archived: z.boolean().optional(),
-});
-
-export const updateNoteSchema = createNoteSchema.partial();
-
-export const noteQuerySchema = z.object({
-  query: z.string().optional(),
-  tags: z
-    .preprocess(value => {
-      if (Array.isArray(value)) {
-        return value
-          .flatMap(entry => (typeof entry === 'string' ? entry.split(',') : []))
-          .map(tag => tag.trim().toLowerCase())
-          .filter(Boolean);
-      }
-      if (typeof value === 'string') {
-        return value
-          .split(',')
-          .map(tag => tag.trim().toLowerCase())
-          .filter(Boolean);
-      }
-      return [];
-    }, z.array(z.string().min(1)).max(10).default([])),
-  status: z.enum(['active', 'archived', 'all']).default('active'),
-});
-
 const optionalDateTime = z.preprocess(
   value => {
+    if (value === null || value === undefined) {
+      return null;
+    }
     if (typeof value !== 'string') {
       return value;
     }
     const trimmed = value.trim();
-    return trimmed.length === 0 ? undefined : trimmed;
+    return trimmed.length === 0 ? null : trimmed;
   },
   z
-    .string()
-    .refine(val => !Number.isNaN(new Date(val).getTime()), { message: 'Invalid date/time' })
+    .union([
+      z
+        .string()
+        .refine(val => !Number.isNaN(new Date(val).getTime()), { message: 'Invalid date/time' }),
+      z.null(),
+    ])
     .optional(),
 );
 
@@ -80,6 +56,40 @@ const optionalImportance = z.preprocess(
     .max(5, 'Importance must be at most 5')
     .optional(),
 );
+
+export const createNoteSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(160, 'Title is too long'),
+  content: z.string().optional(),
+  tags: z.array(z.string().min(1)).max(12).default([]),
+  dueAt: optionalDateTime,
+  estimatedEffort: optionalPositiveMinutes,
+  importance: optionalImportance,
+  pinned: z.boolean().optional(),
+  archived: z.boolean().optional(),
+});
+
+export const updateNoteSchema = createNoteSchema.partial();
+
+export const noteQuerySchema = z.object({
+  query: z.string().optional(),
+  tags: z
+    .preprocess(value => {
+      if (Array.isArray(value)) {
+        return value
+          .flatMap(entry => (typeof entry === 'string' ? entry.split(',') : []))
+          .map(tag => tag.trim().toLowerCase())
+          .filter(Boolean);
+      }
+      if (typeof value === 'string') {
+        return value
+          .split(',')
+          .map(tag => tag.trim().toLowerCase())
+          .filter(Boolean);
+      }
+      return [];
+    }, z.array(z.string().min(1)).max(10).default([])),
+  status: z.enum(['active', 'archived', 'all']).default('active'),
+});
 
 export const createTaskSchema = z.object({
   title: z.string().min(1, 'Title is required').max(160, 'Title is too long'),

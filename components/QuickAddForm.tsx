@@ -115,7 +115,7 @@ export function QuickAddForm({ action }: QuickAddFormProps) {
             ref={inputRef}
             id="quick-add-input"
             name="quickAdd"
-            placeholder='Capture something… e.g. "Prep agenda #focus"'
+            placeholder='Capture something… e.g. "Ship update tomorrow 2h !high #ops"'
             className={`pr-28 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-all duration-200 ease-in-out hover:border-slate-300 hover:bg-white focus:border-purple-500 focus:ring-purple-500/25 focus:shadow-[0_10px_36px_rgba(79,70,229,0.08)]`}
             autoComplete="off"
             data-testid="quick-add-input"

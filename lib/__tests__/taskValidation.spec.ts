@@ -30,7 +30,7 @@ describe('createTaskSchema', () => {
     });
 
     expect(parsed.notes).toBe('');
-    expect(parsed.dueAt).toBeUndefined();
+    expect(parsed.dueAt).toBeNull();
     expect(parsed.estimatedEffort).toBeUndefined();
     expect(parsed.importance).toBeUndefined();
     expect(parsed.project).toBeUndefined();
