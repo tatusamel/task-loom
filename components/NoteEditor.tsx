@@ -169,7 +169,7 @@ export function NoteEditor({ note }: NoteEditorProps) {
             <span className="ml-1 text-[11px] text-slate-500">(Esc)</span>
           </Link>
         </div>
-        <div className="flex items-center gap-2 sm:flex-row sm:items-center sm:gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
             variant="ghost"
@@ -210,11 +210,9 @@ export function NoteEditor({ note }: NoteEditorProps) {
             Delete
           </Button>
         </div>
-        <div className="text-right sm:absolute sm:right-8 sm:top-0 sm:mt-0">
-          <p className="text-[11px] text-slate-500/70">
-            Last updated {new Date(note.updatedAt).toLocaleString()}
-          </p>
-        </div>
+        <p className="text-[11px] text-slate-500/70 sm:ml-auto sm:text-right">
+          Last updated {new Date(note.updatedAt).toLocaleString()}
+        </p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-7">
