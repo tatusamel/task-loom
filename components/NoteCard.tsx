@@ -10,8 +10,6 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import {
   ArchiveIcon,
   ArrowRightIcon,
-  CalendarIcon,
-  ClockIcon,
   LoaderIcon,
   PinIcon,
   RestoreIcon,
@@ -19,7 +17,7 @@ import {
   TagIcon,
 } from '@/components/icons';
 import type { NoteDTO } from '@/types/note';
-import { cn, formatDateTime, formatEffort, formatRelativeDue, getTagTone } from '@/lib/utils';
+import { cn, formatDateTime, getTagTone } from '@/lib/utils';
 import { renderMarkdown } from '@/lib/markdown';
 
 interface NoteCardProps {
@@ -82,8 +80,6 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
     note.content.trim().length > 0
       ? renderMarkdown(note.content.slice(0, compact ? 240 : 360))
       : '';
-  const dueDescription = formatRelativeDue(note.dueAt);
-  const effortDescription = formatEffort(note.estimatedEffort);
   const priorityLabel = note.importance
     ? note.importance >= 4
       ? 'High'
@@ -91,7 +87,6 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
         ? 'Medium'
         : 'Low'
     : null;
-  const hasMetadata = Boolean(dueDescription || effortDescription || priorityLabel);
 
   return (
     <Card
@@ -144,33 +139,19 @@ export function NoteCard({ note, compact = false, selection }: NoteCardProps) {
         ) : null}
       </CardHeader>
       <CardContent className={cn('flex flex-col gap-5 pt-3', selectionInset)}>
-        {hasMetadata ? (
+        {priorityLabel ? (
           <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600">
-            {dueDescription ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-indigo-700">
-                <CalendarIcon className="h-3 w-3" aria-hidden />
-                {dueDescription}
-              </span>
-            ) : null}
-            {effortDescription ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-slate-600">
-                <ClockIcon className="h-3 w-3" aria-hidden />
-                {effortDescription}
-              </span>
-            ) : null}
-            {priorityLabel ? (
-              <span
-                className={cn(
-                  'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5',
-                  priorityLabel === 'High' && 'bg-rose-100 text-rose-700',
-                  priorityLabel === 'Medium' && 'bg-amber-100 text-amber-700',
-                  priorityLabel === 'Low' && 'bg-emerald-100 text-emerald-700',
-                )}
-              >
-                <SparklesIcon className="h-3 w-3" aria-hidden />
-                {priorityLabel} priority
-              </span>
-            ) : null}
+            <span
+              className={cn(
+                'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5',
+                priorityLabel === 'High' && 'bg-rose-100 text-rose-700',
+                priorityLabel === 'Medium' && 'bg-amber-100 text-amber-700',
+                priorityLabel === 'Low' && 'bg-emerald-100 text-emerald-700',
+              )}
+            >
+              <SparklesIcon className="h-3 w-3" aria-hidden />
+              {priorityLabel} priority
+            </span>
           </div>
         ) : null}
         {previewHtml ? (
