@@ -57,7 +57,7 @@ The app runs at [http://localhost:3000](http://localhost:3000).
 - **Data layer** — Prisma with SQLite stores notes and tasks plus a lightweight `Tag` model for shared tagging (SQLite lacks first-class array/JSON types). `lib/notes.ts` / `lib/tasks.ts` surface typed DTO helpers safe for client components.
 - **API routes** — REST endpoints under `/api/notes` and `/api/tasks` enforce Zod validation, hydrate responses, and revalidate affected paths after mutations.
 - **UI components** — Tailwind CSS drives the minimal, accessible interface. Keyboard workflows include quick add, list filtering, and editor shortcuts. Toasts surface optimistic feedback.
-- **Utilities** — `utils/parseQuickAdd.ts` parses inline tags plus natural-language due dates, time estimates, and priority tokens (covered by Vitest). Markdown preview uses `marked`, while shared helpers format due dates, effort, and tag inputs.
+- **Utilities** — `utils/parseQuickAdd.ts` parses inline tags plus inline priority tokens (covered by Vitest). Markdown preview uses `marked`, while shared helpers format due dates, effort, and tag inputs.
 - **Testing & CI** — Vitest covers parsing logic plus task validation rules; Playwright exercises the capture→search→edit→pin flow. GitHub Actions CI runs lint, Prisma validate (`db:push`), seed, unit tests, and Playwright.
 
 ## Data Flow

@@ -4,7 +4,6 @@ import prisma from '@/lib/prisma';
 import { noteRelations, serializeNote } from '@/lib/notes';
 import { ensureTagsExist, normalizeTags } from '@/lib/tags';
 import { updateNoteSchema } from '@/lib/validation';
-import { parseDateTimeInput } from '@/lib/utils';
 import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
@@ -59,20 +58,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     await ensureTagsExist(userId, normalizedTags);
   }
 
-  const dueAtDate =
-    parsed.data.dueAt !== undefined
-      ? parseDateTimeInput(parsed.data.dueAt ?? undefined)
-      : undefined;
-
   const note = await prisma.note.update({
     where: { id_userId: { id: params.id, userId } },
     data: {
       ...(parsed.data.title !== undefined ? { title: parsed.data.title } : {}),
       ...(parsed.data.content !== undefined ? { content: parsed.data.content } : {}),
-      ...(parsed.data.dueAt !== undefined ? { dueAt: dueAtDate ?? null } : {}),
-      ...(parsed.data.estimatedEffort !== undefined
-        ? { estimatedEffort: parsed.data.estimatedEffort ?? null }
-        : {}),
       ...(parsed.data.importance !== undefined
         ? { importance: parsed.data.importance ?? null }
         : {}),

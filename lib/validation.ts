@@ -2,22 +2,15 @@ import { z } from 'zod';
 
 const optionalDateTime = z.preprocess(
   value => {
-    if (value === null || value === undefined) {
-      return null;
-    }
     if (typeof value !== 'string') {
       return value;
     }
     const trimmed = value.trim();
-    return trimmed.length === 0 ? null : trimmed;
+    return trimmed.length === 0 ? undefined : trimmed;
   },
   z
-    .union([
-      z
-        .string()
-        .refine(val => !Number.isNaN(new Date(val).getTime()), { message: 'Invalid date/time' }),
-      z.null(),
-    ])
+    .string()
+    .refine(val => !Number.isNaN(new Date(val).getTime()), { message: 'Invalid date/time' })
     .optional(),
 );
 
@@ -61,8 +54,6 @@ export const createNoteSchema = z.object({
   title: z.string().min(1, 'Title is required').max(160, 'Title is too long'),
   content: z.string().optional(),
   tags: z.array(z.string().min(1)).max(12).default([]),
-  dueAt: optionalDateTime,
-  estimatedEffort: optionalPositiveMinutes,
   importance: optionalImportance,
   pinned: z.boolean().optional(),
   archived: z.boolean().optional(),

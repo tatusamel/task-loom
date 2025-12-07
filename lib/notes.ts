@@ -18,8 +18,6 @@ export function serializeNote(
     title: note.title,
     content: note.content,
     tags: tagNames,
-    dueAt: note.dueAt ? note.dueAt.toISOString() : null,
-    estimatedEffort: note.estimatedEffort ?? null,
     importance: note.importance ?? null,
     pinned: note.pinned,
     archived: note.archived,
