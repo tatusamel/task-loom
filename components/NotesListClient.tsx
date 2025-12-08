@@ -323,14 +323,15 @@ export function NotesListClient({
         <section className="mt-5 grid gap-6 md:grid-cols-2">
           {notes.length > 0 ? (
             notes.map(note => (
-              <NoteCard
-                key={note.id}
-                note={note}
-                selection={{
-                  selected: selectedIds.has(note.id),
-                  onChange: checked => toggleSelection(note.id, checked),
-                }}
-              />
+              <div key={note.id} className="stagger-item">
+                <NoteCard
+                  note={note}
+                  selection={{
+                    selected: selectedIds.has(note.id),
+                    onChange: checked => toggleSelection(note.id, checked),
+                  }}
+                />
+              </div>
             ))
           ) : (
             <EmptyState
